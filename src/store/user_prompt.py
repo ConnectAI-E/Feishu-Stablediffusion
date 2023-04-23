@@ -1,8 +1,13 @@
+import os
 import sqlite3
 
 class UserPrompt:
     def __init__(self, db_file):
         # create db file if not exist
+        if not os.path.exists('data'):
+            os.makedirs('data')
+        if not os.path.exists(db_file):
+            open(db_file, 'w').close()
         open(db_file, 'a').close()
         self.db_file = db_file
         conn = sqlite3.connect(db_file)
