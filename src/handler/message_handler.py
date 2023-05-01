@@ -43,7 +43,7 @@ class MyMessageEventHandler:
             else:
                 gpt_history = [{"role": "assistant", "content": get_text_message(x)} if x.sender_user_id == "assistant" else {
                     "role": "user", "content": get_text_message(x)} for x in db_history]
-                response = get_chat_response(gpt_history,**extra_args)
+                response = get_chat_response(gpt_history, **extra_args)
                 return self.message_sender.send_text_message(
-                    chat_event.sender_user_id, response)
+                    chat_event.user_id, response,  chat_event.open_id)
         return True

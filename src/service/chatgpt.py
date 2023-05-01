@@ -16,20 +16,21 @@ def get_single_response(message, prompt=app_config.DEFAULT_PROMPT):
 def get_chat_response(chat_history, prompt=app_config.DEFAULT_PROMPT):
     messages = [{"role": "system", "content": prompt}, *chat_history]
     gpt_logger.info("GPT request: %s", messages)
-    response = get_gpt_response(messages)
-    if "choices" not in response:
-        gpt_logger.info("GPT raw response: %s", response)
-        return ""
-    choice = response["choices"][0]  # type: ignore
-    if "message" not in choice:
-        gpt_logger.info("GPT raw response: %s", response)
-        return ""
-    message = choice["message"]
-    if "content" in message and "role" in message and message["role"] == "assistant":
-        gpt_logger.info("GPT response: %s", message["content"])
-        return message["content"]
-    gpt_logger.info("GPT raw response: %s", response)
-    return ""
+    return messages[-1]["content"]
+    # response = get_gpt_response(messages)
+    # if "choices" not in response:
+    #     gpt_logger.info("GPT raw response: %s", response)
+    #     return ""
+    # choice = response["choices"][0]  # type: ignore
+    # if "message" not in choice:
+    #     gpt_logger.info("GPT raw response: %s", response)
+    #     return ""
+    # message = choice["message"]
+    # if "content" in message and "role" in message and message["role"] == "assistant":
+    #     gpt_logger.info("GPT response: %s", message["content"])
+    #     return message["content"]
+    # gpt_logger.info("GPT raw response: %s", response)
+    # return ""
 
 
 def get_gpt_response(messages):

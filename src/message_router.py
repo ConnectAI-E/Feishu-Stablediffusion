@@ -55,6 +55,7 @@ def route_im_message(ctx: Context, conf: Config, event: MessageReceiveEvent) -> 
             mark_event_processed(event)
     else:
         chat_event = ChatEvent(**{
+            "open_id": event.event.sender.sender_id.open_id,
             "user_id": event.event.sender.sender_id.user_id,
             "chat_id": event.event.message.chat_id,
             "chat_type": event.event.message.chat_type,

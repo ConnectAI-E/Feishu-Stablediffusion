@@ -19,12 +19,62 @@ class MessageSender:
             raise Exception("conf is required")
         self.conf = conf
 
-    def send_text_message(self, user_id, msg, append=True):
+    def send_text_message(self, user_id, msg, open_id, append=True):
         body = {
+            "open_id": open_id,
             "user_id": user_id,
-            "msg_type": "text",
-            "content": {
-                "text": msg
+            "msg_type": "interactive",
+            "card": {
+                "config": {
+                    "wide_screen_mode": True
+                },
+                "elements": [
+                    {
+                        "tag": "div",
+                        "text": {
+                            "tag": "lark_md",
+                            "content": "根据的描述" + msg + "得到如下结果:"
+                        }
+                    },
+                    {
+                        "alt": {
+                            "content": "",
+                            "tag": "plain_text"
+                        },
+                        "img_key": "img_v2_041b28e3-5680-48c2-9af2-497ace79333g",
+                        "tag": "img"
+                    },
+                    {
+                        "tag": "action",
+                        "actions": [
+                            {
+                               "tag": "button",
+                               "value": {"value": 1, "value2": "str"},
+                               "text": {
+                                   "tag": "plain_text",
+                                   "content": "主按钮"
+                               },
+                                "type": "primary"
+                            },
+                            {
+                                "tag": "button",
+                                "text": {
+                                    "tag": "plain_text",
+                                    "content": "次按钮"
+                                },
+                                "type": "default"
+                            },
+                            {
+                                "tag": "button",
+                                "text": {
+                                    "tag": "plain_text",
+                                    "content": "危险按钮"
+                                },
+                                "type": "danger"
+                            }
+                        ]
+                    }
+                ]
             }
         }
         req = Request('/open-apis/message/v4/send', 'POST', ACCESS_TOKEN_TYPE_TENANT, body,
