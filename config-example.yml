@@ -3,23 +3,15 @@ APP_ID: cli_xxx
 APP_SECRET: xxx
 APP_ENCRYPT_KEY: xxx
 APP_VERIFICATION_TOKEN: xxx
+
 # 请确保和飞书应用管理平台中的设置一致
-BOT_NAME: xxx
-# openAI key
-OPENAI_KEY: sk-xxx,sk-xxx,sk-xxx
+BOT_NAME: SDBot
 
 # 服务器配置
 HTTP_PORT: 9000
 HTTPS_PORT: 9001
 
-# openai 地址, 一般不需要修改, 除非你有自己的反向代理
-API_URL: https://api.openai.com/v1
-# 访问OpenAI的代理设置, 例如 "http://127.0.0.1:7890", ""代表不使用代理
-HTTP_PROXY: ""
-
-# Azure 配置
-IS_AZURE: true
-AZURE_API_HOST: https://xxx.openai.azure.com/
-AZURE_API_KEY: xxx
-GPT_MODEL: gpt-35-turbo
-
+# Stable Diffusion WebU的地址，启动参数中要加入--api
+WEBUI_URL: https://xxx/
+WEBUI_USER: user
+WEBUI_PASSWORD: password

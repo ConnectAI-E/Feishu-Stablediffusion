@@ -1,21 +1,16 @@
 # Note: The openai-python library support for Azure OpenAI is in preview.
 import logging
 import os
-import openai
 from util.app_config import app_config
-from util.logger import gpt_logger, app_logger
+from util.logger import sd_logger, app_logger
 
-openai.api_base = app_config.API_URL
-openai.api_key = app_config.OPENAI_KEY
-
-
-def get_single_response(message, prompt=app_config.DEFAULT_PROMPT):
-    return get_chat_response([{"role": "user", "content": message}])
+def get_single_response(message, prompt):
+    return get_chat_response([{"role": "user", "content": message}], prompt)
 
 
-def get_chat_response(chat_history, prompt=app_config.DEFAULT_PROMPT):
+def get_chat_response(chat_history, prompt):
     messages = [{"role": "system", "content": prompt}, *chat_history]
-    gpt_logger.info("GPT request: %s", messages)
+    sd_logger.info("Chat request: %s", messages)
     return messages[-1]["content"]
     # response = get_gpt_response(messages)
     # if "choices" not in response:
@@ -33,12 +28,12 @@ def get_chat_response(chat_history, prompt=app_config.DEFAULT_PROMPT):
     # return ""
 
 
-def get_gpt_response(messages):
-    response = openai.ChatCompletion.create(
-        model=app_config.GPT_MODEL,
-        messages=messages)
+# def get_gpt_response(messages):
+#     response = openai.ChatCompletion.create(
+#         model=app_config.GPT_MODEL,
+#         messages=messages)
 
-    return response
+#     return response
 
 
 

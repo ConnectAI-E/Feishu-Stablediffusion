@@ -3,7 +3,7 @@ import json
 from larksuiteoapi import Config
 
 from feishu.message_sender import MessageSender
-from service.chatgpt import get_chat_response, get_single_response
+from service.stablediffusion import get_chat_response, get_single_response
 from store.chat_history import ChatEvent, get_chat_context_by_user_id
 from store.user_prompt import user_prompt
 from util.app_config import AppConfig
@@ -36,7 +36,7 @@ class MyMessageEventHandler:
             # get history
             db_history = get_chat_context_by_user_id(chat_event.user_id)
             prompt = user_prompt.read_prompt(chat_event.user_id)
-            extra_args = {"prompt": prompt} if prompt else {}
+            extra_args = {"prompt": prompt} if prompt else {"prompt": prompt}
             if len(db_history) == 0:
                 return self.message_sender.send_text_message(
                     chat_event.sender_user_id, get_chat_response([{"role": "user", "content": content["text"]}], **extra_args))

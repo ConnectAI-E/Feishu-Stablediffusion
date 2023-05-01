@@ -54,6 +54,10 @@ class CommandHandler:
                     user_prompt.write_prompt(event.event.sender.sender_id.user_id, prompt)
                 clean_chat(event.event.sender.sender_id.user_id)
                 self.message_sender.send_text_message(event.event.sender.sender_id.user_id,"Prompt is set", append=False)
+            elif command.startswith("/img "):
+                prompt = command[5:]
+                self.message_sender.send_text_message(event.event.sender.sender_id.user_id,f"Prompt is \"{prompt}\"", append=False)
+                app_logger.info(f"img command: {prompt}")
             else:
                 app_logger.info("unknown command")
                 # self.message_sender.send_text_message(event.event.sender.sender_id.user_id, "Unknown command", append=False)

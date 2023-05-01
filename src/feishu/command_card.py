@@ -73,14 +73,3 @@ COMMAND_CARD = {
     }
   ]
 }
-
-for i in range(len(app_config.PROMPT_DESCRIPTION_LIST)):
-    description = app_config.PROMPT_DESCRIPTION_LIST[i]
-    prompt = app_config.PROMPT_VALUE_LIST[i]
-    COMMAND_CARD['elements'][3]['actions'][0]['options'].append({
-        "text": {
-            "tag": "plain_text",
-            "content": description
-        },
-        "value": prompt
-    })

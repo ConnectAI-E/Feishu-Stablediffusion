@@ -33,7 +33,7 @@ class MessageSender:
                         "tag": "div",
                         "text": {
                             "tag": "lark_md",
-                            "content": "根据的描述" + msg + "得到如下结果:"
+                            "content": "根据的描述 " + msg + " 得到如下结果:"
                         }
                     },
                     {
@@ -52,7 +52,7 @@ class MessageSender:
                                "value": {"value": 1, "value2": "str"},
                                "text": {
                                    "tag": "plain_text",
-                                   "content": "主按钮"
+                                   "content": "重新生成"
                                },
                                 "type": "primary"
                             },
@@ -60,7 +60,7 @@ class MessageSender:
                                 "tag": "button",
                                 "text": {
                                     "tag": "plain_text",
-                                    "content": "次按钮"
+                                    "content": "高清放大"
                                 },
                                 "type": "default"
                             },
@@ -68,7 +68,7 @@ class MessageSender:
                                 "tag": "button",
                                 "text": {
                                     "tag": "plain_text",
-                                    "content": "危险按钮"
+                                    "content": "删除图片"
                                 },
                                 "type": "danger"
                             }

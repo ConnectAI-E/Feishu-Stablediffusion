@@ -10,11 +10,12 @@ from handler.command_handler import CommandHandler
 from handler.message_handler import MyMessageEventHandler
 from util.app_config import app_config
 from feishu.feishu_conf import feishu_conf
-from util.duplicate_filter import bot_event_is_processed, event_is_processed, mark_bot_event_processed, mark_event_processed
+from util.duplicate_filter import bot_event_is_processed, event_is_processed, mark_bot_event_processed, mark_event_processed, unmark_event_processed
 from util.logger import feishu_message_logger, app_logger
 
 message_handler = MyMessageEventHandler(app_config, feishu_conf)
 command_handler = CommandHandler(app_config, feishu_conf)
+
 
 def route_bot_message(body):
     # body.action.value
@@ -30,6 +31,7 @@ def route_bot_message(body):
     command_handler.handle_botmessage(body)
     mark_bot_event_processed(body)
 
+
 def route_im_message(ctx: Context, conf: Config, event: MessageReceiveEvent) -> Any:
     # ignore request if sender_type is not user
     if event.event.sender.sender_type != "user":
@@ -38,7 +40,7 @@ def route_im_message(ctx: Context, conf: Config, event: MessageReceiveEvent) -> 
     if event.header.event_type != "im.message.receive_v1":
         return
     feishu_message_logger.info("Feishu message: %s", attr.asdict(event.event))
-    # if message content text starts with /, then it is a command
+
     json_content = json.loads(event.event.message.content)
 
     if event_is_processed(event):
@@ -49,7 +51,7 @@ def route_im_message(ctx: Context, conf: Config, event: MessageReceiveEvent) -> 
         # ignore event if event is 10 minutes old
         app_logger.debug("Skip old event: %s", attr.asdict(event.event))
         return
-
+    # if message content text starts with /, then it is a command
     if "text" in json_content and json_content["text"].startswith("/"):
         if command_handler.handle_message(event):
             mark_event_processed(event)

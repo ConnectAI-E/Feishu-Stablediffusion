@@ -27,10 +27,10 @@ def get_logger(name):
 
 
 feishu_message_logger = get_logger("feishu_message")
-gpt_logger = get_logger("gpt")
+sd_logger = get_logger("sd")
 app_logger = get_logger("app")
 
 if __name__ == "__main__":
     feishu_message_logger.info("test")
-    gpt_logger.info("test")
+    sd_logger.info("test")
     app_logger.debug("ddd")
