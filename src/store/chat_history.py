@@ -10,7 +10,7 @@ class ChatEvent:
     def __init__(self, **kwargs):
         for k, v in kwargs.items():
             setattr(self, k, v)
-
+    open_id: str
     user_id: str
     chat_id: str
     chat_type: str
@@ -36,13 +36,15 @@ def init_db_if_required():
 def get_chat_context_by_user_id(user_id: str):
     conn = sqlite3.connect(CHAT_HISTORY_DB_FILE)
     c = conn.cursor()
-    c.execute("SELECT * FROM chat_event WHERE user_id = ? order by create_time desc limit 20", (user_id,))
+    c.execute(
+        "SELECT * FROM chat_event WHERE user_id = ? order by create_time desc limit 20", (user_id,))
     rows = c.fetchall()
-    result = [ChatEvent(**dict(zip([column[0] for column in c.description], row))) for row in rows[::-1]]
+    result = [ChatEvent(
+        **dict(zip([column[0] for column in c.description], row))) for row in rows[::-1]]
     conn.close()
     return result
 
-def clean_chat(user_id:str):
+def clean_chat(user_id: str):
     conn = sqlite3.connect(CHAT_HISTORY_DB_FILE)
     c = conn.cursor()
     c.execute("DELETE FROM chat_event WHERE user_id = ?", (user_id,))
@@ -52,7 +54,8 @@ def clean_chat(user_id:str):
 def append_chat_event(chat_event: ChatEvent):
     conn = sqlite3.connect(CHAT_HISTORY_DB_FILE)
     c = conn.cursor()
-    c.execute("INSERT INTO chat_event VALUES (?, ?, ?, ?, ?, ?, ?, ?)", (chat_event.user_id, chat_event.chat_id, chat_event.chat_type, chat_event.message_id, chat_event.message_type, chat_event.content, chat_event.create_time, chat_event.sender_user_id))
+    c.execute("INSERT INTO chat_event VALUES (?, ?, ?, ?, ?, ?, ?, ?)", (chat_event.user_id, chat_event.chat_id, chat_event.chat_type,
+              chat_event.message_id, chat_event.message_type, chat_event.content, chat_event.create_time, chat_event.sender_user_id))
     conn.commit()
     conn.close()
 
