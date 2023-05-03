@@ -52,9 +52,11 @@ def route_im_message(ctx: Context, conf: Config, event: MessageReceiveEvent) -> 
         app_logger.debug("Skip old event: %s", attr.asdict(event.event))
         return
     # if message content text starts with /, then it is a command
+    # 带有 / 的消息是命令处理
     if "text" in json_content and json_content["text"].startswith("/"):
         if command_handler.handle_message(event):
             mark_event_processed(event)
+    # 否则都认为是图片的 prompt 信息处理
     else:
         chat_event = ChatEvent(**{
             "open_id": event.event.sender.sender_id.open_id,

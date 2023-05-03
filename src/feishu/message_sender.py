@@ -19,62 +19,12 @@ class MessageSender:
             raise Exception("conf is required")
         self.conf = conf
 
-    def send_text_message(self, user_id, msg, open_id, append=True):
+    def send_text_message(self, user_id, msg, append=True):
         body = {
-            "open_id": open_id,
             "user_id": user_id,
-            "msg_type": "interactive",
-            "card": {
-                "config": {
-                    "wide_screen_mode": True
-                },
-                "elements": [
-                    {
-                        "tag": "div",
-                        "text": {
-                            "tag": "lark_md",
-                            "content": "根据的描述 " + msg + " 得到如下结果:"
-                        }
-                    },
-                    {
-                        "alt": {
-                            "content": "",
-                            "tag": "plain_text"
-                        },
-                        "img_key": "img_v2_041b28e3-5680-48c2-9af2-497ace79333g",
-                        "tag": "img"
-                    },
-                    {
-                        "tag": "action",
-                        "actions": [
-                            {
-                               "tag": "button",
-                               "value": {"value": 1, "value2": "str"},
-                               "text": {
-                                   "tag": "plain_text",
-                                   "content": "重新生成"
-                               },
-                                "type": "primary"
-                            },
-                            {
-                                "tag": "button",
-                                "text": {
-                                    "tag": "plain_text",
-                                    "content": "高清放大"
-                                },
-                                "type": "default"
-                            },
-                            {
-                                "tag": "button",
-                                "text": {
-                                    "tag": "plain_text",
-                                    "content": "删除图片"
-                                },
-                                "type": "danger"
-                            }
-                        ]
-                    }
-                ]
+            "msg_type": "text",
+            "content": {
+                "text": msg
             }
         }
         req = Request('/open-apis/message/v4/send', 'POST', ACCESS_TOKEN_TYPE_TENANT, body,
@@ -100,12 +50,46 @@ class MessageSender:
             app_logger.error(
                 "send message failed, code:%s, msg:%s, error:%s", resp.code, resp.msg, resp.error)
             return False
+    # 发送消息卡片
+    def send_message_card(self, user_id, messageCard):
+        body = {
+            "user_id": user_id,
+            "msg_type": "interactive",
+            "card": messageCard
+        }
+        req = Request('/open-apis/message/v4/send', 'POST', ACCESS_TOKEN_TYPE_TENANT, body,
+                      output_class=Message, request_opts=[set_timeout(3)])
+        resp = req.do(self.conf)
+        app_logger.debug("send_command_card to %s", user_id)
+        if resp.code == 0:
+            return True
+        else:
+            app_logger.error(
+                "send message failed, code:%s, msg:%s, error:%s", resp.code, resp.msg, resp.error)
+            return False
 
     def send_command_card(self, user_id):
         body = {
             "user_id": user_id,
             "msg_type": "interactive",
             "card": COMMAND_CARD
+        }
+        req = Request('/open-apis/message/v4/send', 'POST', ACCESS_TOKEN_TYPE_TENANT, body,
+                      output_class=Message, request_opts=[set_timeout(3)])
+        resp = req.do(self.conf)
+        app_logger.debug("send_command_card to %s", user_id)
+        if resp.code == 0:
+            return True
+        else:
+            app_logger.error(
+                "send message failed, code:%s, msg:%s, error:%s", resp.code, resp.msg, resp.error)
+            return False
+
+    def send_card(self, user_id, card):
+        body = {
+            "user_id": user_id,
+            "msg_type": "interactive",
+            "card": card
         }
         req = Request('/open-apis/message/v4/send', 'POST', ACCESS_TOKEN_TYPE_TENANT, body,
                       output_class=Message, request_opts=[set_timeout(3)])
