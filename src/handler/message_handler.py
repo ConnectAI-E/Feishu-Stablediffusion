@@ -3,14 +3,14 @@ import json
 from larksuiteoapi import Config
 
 from feishu.message_sender import MessageSender
-from service.stablediffusion import get_chat_response, get_single_response
+from feishu.upload_image import upload_image
 from store.chat_history import ChatEvent, get_chat_context_by_user_id
 from store.user_prompt import user_prompt
 from util.app_config import AppConfig
 from util.logger import app_logger
 from service.image_configure import ImageConfiguration
 from feishu.message_card import handle_image_card
-
+from service.stablediffusion import generate_images
 
 def get_text_message(chat_event: ChatEvent):
     try:
@@ -19,7 +19,8 @@ def get_text_message(chat_event: ChatEvent):
             return content["text"]
     except json.JSONDecodeError:
         return chat_event.content
-    
+
+
 def parse_query_string(query_string):
     result = {}
     if query_string:
@@ -30,6 +31,7 @@ def parse_query_string(query_string):
             value = key_value[1] if len(key_value) > 1 else ""
             result[key] = value
     return result
+
 
 def update_image_configuration(config, image_cfg):
     if "prompt" in config:
@@ -55,15 +57,18 @@ def update_image_configuration(config, image_cfg):
     if "seed" in config:
         image_cfg.set_seed(int(config["seed"]))
 
+
 # 根据指令生成不同的消息卡片
 def handle_prompt(content):
-        inputModel = parse_query_string(content)
-        # Check if the prompt contains the substring "/help"
-        image_cfg = ImageConfiguration()
-        update_image_configuration(inputModel, image_cfg)
-        image_configuration = image_cfg.get_config_json()
-        img_key = 'img_v2_041b28e3-5680-48c2-9af2-497ace79333g'
-        return handle_image_card(image_configuration, img_key)
+    # inputModel = parse_query_string(content)
+    # Check if the prompt contains the substring "/help"
+    image_cfg = ImageConfiguration()
+    # update_image_configuration(inputModel, image_cfg)
+    image_cfg.set_prompt(content)
+    image_configuration = image_cfg.get_config_json()
+    img_data = generate_images(image_cfg)
+    img_key = upload_image(img_data)
+    return handle_image_card(image_configuration, img_key)
 
 
 class MyMessageEventHandler:
@@ -80,18 +85,8 @@ class MyMessageEventHandler:
         content = json.loads(chat_event.content)
         # check if the message is already handled
         if "text" in content:
-            # get history
-            db_history = get_chat_context_by_user_id(chat_event.user_id)
-            prompt = user_prompt.read_prompt(chat_event.user_id)
-            extra_args = {"prompt": prompt} if prompt else {"prompt": prompt}
-            if len(db_history) == 0:
-                return self.message_sender.send_text_message(
-                    chat_event.sender_user_id, get_chat_response([{"role": "user", "content": content["text"]}], **extra_args))
-            else:
-                gpt_history = [{"role": "assistant", "content": get_text_message(x)} if x.sender_user_id == "assistant" else {
-                    "role": "user", "content": get_text_message(x)} for x in db_history]
-                response = get_chat_response(gpt_history, **extra_args)
-                messageCard = handle_prompt(response)
-                return self.message_sender.send_message_card(
-                    chat_event.user_id, messageCard)
+            messageCard = handle_prompt(content['text'])
+            return self.message_sender.send_message_card(
+                chat_event.user_id, messageCard
+            )
         return True
