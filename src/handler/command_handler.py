@@ -5,7 +5,7 @@ from feishu.message_sender import MessageSender
 from store.chat_history import clean_chat
 from util.logger import app_logger
 from store.user_prompt import user_prompt
-
+from service.image_configure import ImageConfiguration
 class CommandHandler:
     def __init__(self, app_config: AppConfig, conf: Config):
         if not app_config:
@@ -38,6 +38,7 @@ class CommandHandler:
 
 
     def handle_message(self, event):
+        image_configuration = ImageConfiguration()
         json_content = json.loads(event.event.message.content)
         if "text" in json_content and json_content["text"].startswith("/"):
             command = json_content["text"]
@@ -58,6 +59,10 @@ class CommandHandler:
                 prompt = command[5:]
                 self.message_sender.send_text_message(event.event.sender.sender_id.user_id,f"Prompt is \"{prompt}\"", append=False)
                 app_logger.info(f"img command: {prompt}")
+            elif command.startswith("/help"):
+                prompt = command[5:]
+                self.message_sender.send_card(event.event.sender.sender_id.user_id, image_configuration.help())
+                app_logger.info(f"request /help")
             else:
                 app_logger.info("unknown command")
                 # self.message_sender.send_text_message(event.event.sender.sender_id.user_id, "Unknown command", append=False)
