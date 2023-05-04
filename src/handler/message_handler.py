@@ -21,52 +21,45 @@ def get_text_message(chat_event: ChatEvent):
         return chat_event.content
 
 
-def parse_query_string(query_string):
+def parse_command_line_args(command_line_args):
     result = {}
-    if query_string:
-        pairs = query_string.split("&")
-        for pair in pairs:
-            key_value = pair.split("=")
-            key = key_value[0]
-            value = key_value[1] if len(key_value) > 1 else ""
-            result[key] = value
+    if command_line_args:
+        # Split the command line args into individual tokens
+        tokens = command_line_args.split()
+        i = 0
+        while i < len(tokens):
+            token = tokens[i]
+            if token.startswith("--"):
+                # This is an option
+                option_name = token[2:]
+                if i + 1 < len(tokens) and not tokens[i + 1].startswith("--"):
+                    # The option has a value
+                    option_value = tokens[i + 1]
+                    result[option_name] = option_value
+                    i += 1
+                else:
+                    # The option does not have a value
+                    result[option_name] = ""
+            else:
+                # This is an argument
+                if "prompt" in result:
+                    # Append to the existing prompt
+                    result["prompt"] += " " + token
+                else:
+                    # Create a new prompt
+                    result["prompt"] = token
+            i += 1
     return result
-
-
-def update_image_configuration(config, image_cfg):
-    if "prompt" in config:
-        image_cfg.set_prompt(config["prompt"])
-    if "model" in config:
-        image_cfg.set_model(config["model"])
-    if "negative" in config:
-        image_cfg.set_negative(config["negative"])
-    if "sampler" in config:
-        image_cfg.set_sampler(config["sampler"])
-    if "step" in config:
-        image_cfg.set_step(int(config["step"]))
-    if "width" in config:
-        image_cfg.set_width(int(config["width"]))
-    if "height" in config:
-        image_cfg.set_height(int(config["height"]))
-    if "batch_count" in config:
-        image_cfg.set_batch_count(int(config["batch_count"]))
-    if "batch_size" in config:
-        image_cfg.set_batch_size(int(config["batch_size"]))
-    if "cfg" in config:
-        image_cfg.set_cfg(int(config["cfg"]))
-    if "seed" in config:
-        image_cfg.set_seed(int(config["seed"]))
 
 
 # 根据指令生成不同的消息卡片
 def handle_prompt(content):
-    # inputModel = parse_query_string(content)
+    inputModel = parse_command_line_args(content)
     # Check if the prompt contains the substring "/help"
     image_cfg = ImageConfiguration()
-    # update_image_configuration(inputModel, image_cfg)
-    image_cfg.set_prompt(content)
+    image_cfg.update_image_configuration(inputModel, image_cfg)
     image_configuration = image_cfg.get_config_json()
-    img_data = generate_images(image_cfg)
+    img_data = generate_images(image_configuration)
     img_key = upload_image(img_data)
     return handle_image_card(image_configuration, img_key)
 

@@ -67,7 +67,7 @@ def handle_image_card(image_cfg, img_key = 'img_v2_041b28e3-5680-48c2-9af2-497ac
                         "tag": "div",
                         "text": {
                             "tag": "lark_md",
-                            "content": image_cfg
+                            "content": json.dumps(image_cfg)
                         }
                     },
                     {
