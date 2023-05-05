@@ -19,3 +19,17 @@ def generate_images(gen_cfg):
     )
     img_bytes = base64.b64decode(response.json()["images"][0])
     return img_bytes
+
+
+def send_api_request(endpoint, method="GET", headers=None, data=None, params=None, auth=(app_config.WEBUI_USER, app_config.WEBUI_PASSWORD)):
+    url = f"{app_config.WEBUI_URL}{endpoint}"
+    response = requests.request(
+        method=method,
+        url=url,
+        headers=headers,
+        data=data,
+        params=params,
+        auth=auth
+    )
+    response.raise_for_status()
+    return response.json()

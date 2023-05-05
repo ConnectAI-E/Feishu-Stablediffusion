@@ -25,7 +25,7 @@ def handle_list_info_card(LIST_INFO_CARD, list):
             "tag": "div",
             "text": {
                 "tag": "lark_md",
-                "content": item
+                "content": json.dumps(item)
             }
         }
         

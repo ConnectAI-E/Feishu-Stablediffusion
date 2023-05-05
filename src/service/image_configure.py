@@ -54,17 +54,17 @@ class ImageConfiguration:
         list = ['help', 'list', 'list models', 'list samplers', 'host info', 'queue', 'log', 'set model', 'set negative', 'set sampler', 'set step', 'set width', 'set height', 'set batch count', 'set batch size', 'set cfg', 'set seed']
         return handle_list_info_card(LIST_INFO_CARD, list)
 
-    def list_models(self):
-        print("Available models: ...") # TODO: add list of models
-
-    def list_sampler(self):
-        print("Available samplers: ...") # TODO: add list of samplers
+    def list_models(self, models):
+        return handle_list_info_card(LIST_INFO_CARD, models)
+    
+    def list_sampler(self, models):
+        return handle_list_info_card(LIST_INFO_CARD, models)
 
     def host_info(self):
         print("System information: ...") # TODO: display system information
 
-    def queue(self):
-        print("Queue length: ...") # TODO: display queue length
+    def queue(self, models):
+        return handle_list_info_card(LIST_INFO_CARD, models)
 
     def log(self, n=None):
         if n is None:
