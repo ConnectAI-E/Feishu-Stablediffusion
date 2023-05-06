@@ -343,10 +343,9 @@ class ImageConfiguration:
         if "negative" in config:
             image_cfg.set_negative(config["negative"])
         if "sampler" in config:
-            config.set()
             image_cfg.set_sampler(config["sampler"])
         if "steps" in config:
-            image_cfg.set_step(config["steps"])
+            image_cfg.set_steps(config["steps"])
         if "width" in config:
             image_cfg.set_width(config["width"])
         if "height" in config:

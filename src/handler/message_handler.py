@@ -58,9 +58,11 @@ class MessageHandler:
         image_cfg = ImageConfiguration()
         image_cfg.update_image_configuration(inputModel, image_cfg)
         image_configuration = image_cfg.get_config_json()
-        img_data = generate_images(image_configuration)
-        img_key = upload_image(img_data)
-        return handle_image_card(image_configuration, img_key)
+        images_json = generate_images(image_configuration)
+        images_key = []
+        for img_data in images_json['images']:
+            images_key.append(upload_image(img_data))
+        return handle_image_card(images_json['info'], images_key)
 
     def handle_message(self, event):
         content = json.loads(event.event.message.content)
