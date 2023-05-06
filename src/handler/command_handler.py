@@ -33,7 +33,7 @@ class CommandHandler:
         elif command.startswith("/list_samplers"):
             models_endpoint = "/sdapi/v1/samplers"
             samplers = send_api_request(models_endpoint)
-            samplers_names = [data.get('samplers_name') for data in samplers]
+            samplers_names = [data.get('name') for data in samplers]
             self.message_sender.send_card(back_id, image_configuration.list_sampler(samplers_names))
             app_logger.info(f"/sdapi/v1/samplers")
         elif command.startswith("/queue"):
