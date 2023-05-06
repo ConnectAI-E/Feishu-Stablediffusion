@@ -5,13 +5,11 @@ from flask import Flask, request
 from flask.helpers import make_response
 from larksuiteoapi.service.im.v1.event import MessageReceiveEventHandler
 
-from store.chat_history import init_db_if_required
-from message_router import route_bot_message, route_im_message
+from message_router import route_im_message
 
 from feishu.feishu_conf import feishu_conf
 from util.app_config import app_config
 
-init_db_if_required()
 MessageReceiveEventHandler.set_callback(feishu_conf, route_im_message)
 
 app = Flask("feishu_sd_bot")
@@ -52,7 +50,6 @@ def webhook_event():
 
 
 def app_main():
-    init_db_if_required()
     app.run(port=app_config.HTTP_PORT, host="0.0.0.0")
 
 
