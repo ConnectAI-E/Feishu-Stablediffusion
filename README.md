@@ -45,7 +45,7 @@ curl https://api-inference.huggingface.co/models/runwayml/stable-diffusion-v1-5 
 1. /model 设置SD模型；
 2. /negative 设置负提示词；
 3. /sampler 设置采样器，默认"Euler a"；
-4. /step 设置采样步数，默认20；
+4. /steps 设置采样步数，默认20；
 5. /width 设置宽度，默认512；
 6. /height 设置高度，默认512；
 7. /batch_count 设置几个批次，默认为1；

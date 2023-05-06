@@ -8,7 +8,7 @@ class ImageConfiguration:
         self.model = "SD"
         self.negative = ""
         self.sampler = "Euler a"
-        self.step = 30
+        self.steps = 30
         self.width = 512
         self.height = 512
         self.batch_count = 1
@@ -51,7 +51,7 @@ class ImageConfiguration:
 
     # Methods for displaying information
     def help(self):
-        list = ['help', 'list models', 'list samplers', 'host info', 'queue', 'log', 'set model', 'set negative', 'set sampler', 'set step', 'set width', 'set height', 'set batch count', 'set batch size', 'set cfg', 'set seed']
+        list = ['help', 'list models', 'list samplers', 'host info', 'queue', 'log', 'set model', 'set negative', 'set sampler', 'set steps', 'set width', 'set height', 'set batch count', 'set batch size', 'set cfg', 'set seed']
         return handle_list_info_card(LIST_INFO_CARD, list)
 
     def list_models(self, models):
@@ -88,8 +88,8 @@ class ImageConfiguration:
     def get_sampler(self):
         return self.sampler
     
-    def get_step(self):
-        return self.step
+    def get_steps(self):
+        return self.steps
     
     def get_width(self):
         return self.width
@@ -218,8 +218,8 @@ class ImageConfiguration:
     def set_sampler(self, sampler):
         self.sampler = sampler
 
-    def set_step(self, step):
-        self.step = step
+    def set_steps(self, steps):
+        self.steps = steps
 
     def set_width(self, width):
         self.width = width
@@ -345,8 +345,8 @@ class ImageConfiguration:
         if "sampler" in config:
             config.set()
             image_cfg.set_sampler(config["sampler"])
-        if "step" in config:
-            image_cfg.set_step(config["step"])
+        if "steps" in config:
+            image_cfg.set_step(config["steps"])
         if "width" in config:
             image_cfg.set_width(config["width"])
         if "height" in config:
@@ -419,7 +419,7 @@ class ImageConfiguration:
             "model": self.model,
             "negative": self.negative,
             "sampler": self.sampler,
-            "step": self.step,
+            "steps": self.steps,
             "width": self.width,
             "height": self.height,
             "batch_count": self.batch_count,
