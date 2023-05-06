@@ -8,11 +8,11 @@ class ImageConfiguration:
         self.model = "SD"
         self.negative = ""
         self.sampler = "Euler a"
-        self.step = 50
+        self.step = 30
         self.width = 512
         self.height = 512
-        self.batch_count = 2
-        self.batch_size = 2
+        self.batch_count = 1
+        self.batch_size = 1
         self.cfg = 7
         self.seed = -1
         self.log_size = 5
@@ -51,7 +51,7 @@ class ImageConfiguration:
 
     # Methods for displaying information
     def help(self):
-        list = ['help', 'list', 'list models', 'list samplers', 'host info', 'queue', 'log', 'set model', 'set negative', 'set sampler', 'set step', 'set width', 'set height', 'set batch count', 'set batch size', 'set cfg', 'set seed']
+        list = ['help', 'list models', 'list samplers', 'host info', 'queue', 'log', 'set model', 'set negative', 'set sampler', 'set step', 'set width', 'set height', 'set batch count', 'set batch size', 'set cfg', 'set seed']
         return handle_list_info_card(LIST_INFO_CARD, list)
 
     def list_models(self, models):
