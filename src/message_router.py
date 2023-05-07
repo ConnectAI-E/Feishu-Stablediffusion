@@ -21,12 +21,13 @@ command_handler = CommandHandler(app_config, feishu_conf)
 
 def route_im_message(ctx: Context, conf: Config, event: MessageReceiveEvent) -> Any:
     # ignore request if sender_type is not user
+    print(event.event.message.chat_id)
     if event.event.sender.sender_type != "user":
         return
     # ignore request if event_type is not im.message.receive_v1
     if event.header.event_type != "im.message.receive_v1":
         return
-    feishu_message_logger.info("Feishu message: %s", attr.asdict(event.event))
+    # feishu_message_logger.info("Feishu message: %s", attr.asdict(event.event))
 
     json_content = json.loads(event.event.message.content)
 
@@ -37,6 +38,7 @@ def route_im_message(ctx: Context, conf: Config, event: MessageReceiveEvent) -> 
         # ignore event if event is 10 minutes old
         app_logger.debug("Skip old event: %s", attr.asdict(event.event))
         return
+
 
     try:
         if "text" in json_content:

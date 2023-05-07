@@ -67,7 +67,8 @@ class MessageHandler:
     def handle_message(self, event):
         content = json.loads(event.event.message.content)
         # check if the message is already handled
-        back_id = event.event.sender.sender_id.user_id
+        _back_id = event.event.sender.sender_id.user_id
+        chat_id = event.event.message.chat_id
         messageCard = self.handle_prompt(content["text"])
 
-        return self.message_sender.send_message_card(back_id, messageCard)
+        return self.message_sender.send_message_card(chat_id, messageCard)
