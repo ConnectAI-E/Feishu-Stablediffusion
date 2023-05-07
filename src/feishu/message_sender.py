@@ -17,9 +17,9 @@ class MessageSender:
             raise Exception("conf is required")
         self.conf = conf
 
-    def send_text_message(self, user_id, msg, append=True):
+    def send_text_message(self, chat_id, msg, append=True):
         body = {
-            "user_id": user_id,
+            "chat_id": chat_id,
             "msg_type": "text",
             "content": {
                 "text": msg
@@ -37,16 +37,16 @@ class MessageSender:
                 "send message failed, code:%s, msg:%s, error:%s", resp.code, resp.msg, resp.error)
             return False
     # 发送消息卡片
-    def send_message_card(self, user_id, messageCard):
+    def send_message_card(self, chat_id, messageCard):
         body = {
-            "user_id": user_id,
+            "chat_id": chat_id,
             "msg_type": "interactive",
             "card": messageCard
         }
         req = Request('/open-apis/message/v4/send', 'POST', ACCESS_TOKEN_TYPE_TENANT, body,
                       output_class=Message, request_opts=[set_timeout(3)])
         resp = req.do(self.conf)
-        app_logger.debug("send_command_card to %s", user_id)
+        app_logger.debug("send_command_card to %s", chat_id)
         if resp.code == 0:
             return True
         else:
@@ -54,16 +54,16 @@ class MessageSender:
                 "send message failed, code:%s, msg:%s, error:%s", resp.code, resp.msg, resp.error)
             return False
 
-    def send_card(self, user_id, card):
+    def send_card(self, chat_id, card):
         body = {
-            "user_id": user_id,
+            "chat_id": chat_id,
             "msg_type": "interactive",
             "card": card
         }
         req = Request('/open-apis/message/v4/send', 'POST', ACCESS_TOKEN_TYPE_TENANT, body,
                       output_class=Message, request_opts=[set_timeout(3)])
         resp = req.do(self.conf)
-        app_logger.debug("send_command_card to %s", user_id)
+        app_logger.debug("send_command_card to %s", chat_id)
         if resp.code == 0:
             return True
         else:
