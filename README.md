@@ -1,6 +1,29 @@
-# Feishu-Stablediffusion
 
-🎭 由stablediffusion赋能的飞书图片生成类机器人
+<p align='center'>
+
+  <img width="1000" alt="image" src="https://user-images.githubusercontent.com/50035229/236652971-3b37e644-7f29-4861-8a51-8445e4e588d3.png">
+	
+<details align='center'>
+    <summary> 📷 点击展开完整功能截图</summary>
+    <br>
+    <p align='center'>
+   <img width="1122" alt="image" src="https://user-images.githubusercontent.com/50035229/236653023-8cd147c6-c1de-44f1-a91f-6d8e2ce86f37.png">
+   <img width="1120" alt="image" src="https://user-images.githubusercontent.com/50035229/236653053-f12d0208-2b03-40b2-a2e6-569c976014d8.png">
+    </p>
+
+</details>	
+	
+	
+</p>
+
+<p align='center'>
+   🎭 由stablediffusion赋能的飞书图片生成类机器人
+<br>
+<br>
+    🚀 Feishu SD 🚀
+</p>
+
+
 
 ## Refer
 
