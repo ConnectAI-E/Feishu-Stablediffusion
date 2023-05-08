@@ -6,6 +6,7 @@ from feishu.message_sender import MessageSender
 from feishu.upload_image import upload_image
 from util.app_config import AppConfig
 from util.logger import app_logger
+from util.event_helper import get_pure_message
 from service.image_configure import ImageConfiguration
 from feishu.message_card import handle_image_card
 from service.stablediffusion import generate_images
@@ -52,8 +53,8 @@ class MessageHandler:
         return result
 
     # 根据指令生成不同的消息卡片
-    def handle_prompt(self, content):
-        inputModel = self.parse_command_line_args(content)
+    def handle_prompt(self, prompt):
+        inputModel = self.parse_command_line_args(prompt)
         # Check if the prompt contains the substring "/help"
         image_cfg = ImageConfiguration()
         image_cfg.update_image_configuration(inputModel, image_cfg)
@@ -65,10 +66,11 @@ class MessageHandler:
         return handle_image_card(images_json['info'], images_key)
 
     def handle_message(self, event):
-        content = json.loads(event.event.message.content)
-        # check if the message is already handled
-        _back_id = event.event.sender.sender_id.user_id
+        user_id = event.event.sender.sender_id.user_id
         chat_id = event.event.message.chat_id
-        messageCard = self.handle_prompt(content["text"])
+        msg_id = event.event.message.message_id
+        
+        text = get_pure_message(event)
+        messageCard = self.handle_prompt(text)
 
-        return self.message_sender.send_message_card(chat_id, messageCard)
+        return self.message_sender.send_message_card(chat_id, user_id, msg_id, messageCard)
