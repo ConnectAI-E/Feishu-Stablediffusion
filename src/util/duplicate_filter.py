@@ -49,6 +49,15 @@ def is_processed(message_id):
     app_logger.debug("message_id: %s", message_id)
     if message_id in processed_map:
         return True
+
+    conn = sqlite3.connect(DB_PATH)
+    c = conn.cursor()
+    c.execute("SELECT * FROM records WHERE id = ?", (message_id,))
+    row = c.fetchone()
+    conn.close()
+    if row:
+        return True
+
     return False
 
 
