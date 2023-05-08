@@ -52,6 +52,11 @@ class MessageHandler:
                 i += 1
         return result
 
+    def handle_update_message_card(self, token, openId, prompt):
+        messageCard = self.handle_prompt(prompt)
+        messageCard["open_ids"] = [openId]
+        return self.message_sender.update_message_card(token, messageCard)
+
     # 根据指令生成不同的消息卡片
     def handle_prompt(self, prompt):
         inputModel = self.parse_command_line_args(prompt)

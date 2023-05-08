@@ -76,6 +76,33 @@ class MessageSender:
                 resp.error,
             )
             return False
+        
+    # 更新消息卡片
+    def update_message_card(self, token, messageCard):
+        body = {
+            "token": token,
+            "card": messageCard,
+        }
+        req = Request(
+            "/open-apis/interactive/v1/card/update",
+            "POST",
+            ACCESS_TOKEN_TYPE_TENANT,
+            body,
+            output_class=Message,
+            request_opts=[set_timeout(3)],
+        )
+        resp = req.do(self.conf)
+        app_logger.debug("update_message_card to %s", token)
+        if resp.code == 0:
+            return True
+        else:
+            app_logger.error(
+                "update message card failed, code:%s, msg:%s, error:%s",
+                resp.code,
+                resp.msg,
+                resp.error,
+            )
+            return False
 
 
 if __name__ == "__main__":

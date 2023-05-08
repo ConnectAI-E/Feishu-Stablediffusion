@@ -24,20 +24,78 @@ def handle_list_info_card(LIST_INFO_CARD, list):
 
 
 def handle_image_card(image_info, img_key_list):
+
+    # 过滤字段 = ['all_prompts', 'infotexts']
+    data = json.loads(image_info)
+    filter_keys = ['all_prompts']
+    new_data = {k: v for k, v in data.items() if k not in filter_keys}
+    json_str = '\n'.join(' **【' + k + '】** ' + str(v) for k, v in new_data.items())
+
     elements = [
-        {"tag": "div", "text": {"tag": "lark_md", "content": "根据如下参数生成:"}},
+        {"tag": "column_set", "flex_mode": "none", "background_style": "default", "columns": []},
         {
-            "tag": "div",
-            "text": {"tag": "lark_md", "content": image_info.replace('\\', '')},
+        "tag": "markdown",
+        "content": json_str
         },
+        {
+        "tag": "action",
+        "actions": [
+          {
+            "tag": "button",
+            "text": {
+              "tag": "plain_text",
+              "content": "重新生成"
+            },
+            "type": "primary",
+            "value": {
+              "type": "reload",
+              "prompt": data['prompt'],
+            }
+          }
+        ]
+    }
     ]
     for img_key in img_key_list:
-        elements.append(
+        elements[0]["columns"].append(
+          {
+          "tag": "column",
+          "width": "weighted",
+          "weight": 1,
+          "vertical_align": "top",
+          "elements": [
             {
-                "alt": {"content": "", "tag": "plain_text"},
-                "img_key": img_key,
-                "tag": "img",
+              "tag": "column_set",
+              "flex_mode": "none",
+              "background_style": "grey",
+              "columns": [
+                {
+                  "tag": "column",
+                  "width": "weighted",
+                  "weight": 1,
+                  "vertical_align": "top",
+                  "elements": [
+                    {
+                      "tag": "img",
+                      "img_key": img_key,
+                      "alt": {
+                        "tag": "plain_text",
+                        "content": ""
+                      },
+                      "mode": "fit_horizontal",
+                      "preview": True
+                    }
+                  ]
+                }
+              ]
             }
+          ]
+        }
         )
 
-    return {"config": {"wide_screen_mode": True}, "elements": elements}
+    return {"config": {"wide_screen_mode": True}, "elements": elements,  "header": {
+      "template": "green",
+      "title": {
+        "content": "🤖️ 根据如下参数生成:",
+        "tag": "plain_text"
+      }
+    }}
