@@ -33,7 +33,6 @@ def webhook_card():
     )
     resp = make_response()
     oapi_resp = handle_card(feishu_conf, oapi_request)
-    oapi_resp.body = delayedUpdateMessageCard(oapi_resp.body)
     resp.headers["Content-Type"] = oapi_resp.content_type
     resp.data = oapi_resp.body
     resp.status_code = oapi_resp.status_code

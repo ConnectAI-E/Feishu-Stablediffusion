@@ -12,7 +12,10 @@ message_handler = MessageHandler(app_config, feishu_conf)
 command_handler = CommandHandler(app_config, feishu_conf)
 
 def action_im_message(ctx: Context, conf: Config, card: MessageReceiveEvent) -> Any:
-    return card
+    if hasattr(card, 'action'):
+        t = threading.Thread(target=handledelayedUpdateMessageCard(card.token, card.open_id, card.action.value["prompt"]))
+        t.start()
+    return {}
 
 def handledelayedUpdateMessageCard(token,openId, prompt):
     message_handler.handle_update_message_card(token, openId, prompt)
