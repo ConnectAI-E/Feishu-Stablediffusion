@@ -7,9 +7,9 @@ from feishu.upload_image import upload_image
 from util.app_config import AppConfig
 from util.logger import app_logger
 from util.event_helper import get_pure_message
-from service.image_configure import ImageConfiguration
+from service.generate_config import GenerateConfig
 from feishu.message_card import handle_image_card
-from service.stablediffusion import generate_images
+from service.stablediffusion import sd_webui
 
 
 class MessageHandler:
@@ -61,10 +61,10 @@ class MessageHandler:
     def handle_prompt(self, prompt):
         inputModel = self.parse_command_line_args(prompt)
         # Check if the prompt contains the substring "/help"
-        image_cfg = ImageConfiguration()
+        image_cfg = GenerateConfig()
         image_cfg.update_image_configuration(inputModel, image_cfg)
         image_configuration = image_cfg.get_config_json()
-        images_json = generate_images(image_configuration)
+        images_json = sd_webui.generate_images(image_configuration)
         images_key = []
         for img_data in images_json['images']:
             images_key.append(upload_image(img_data))
