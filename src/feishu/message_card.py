@@ -23,7 +23,7 @@ def handle_list_info_card(LIST_INFO_CARD, list):
     return LIST_INFO_CARD
 
 
-def handle_image_card(image_info, img_key_list):
+def handle_image_card(image_info, img_key_list, prompt):
 
     # 过滤字段 = ['all_prompts', 'infotexts']
     data = json.loads(image_info)
@@ -49,7 +49,7 @@ def handle_image_card(image_info, img_key_list):
             "type": "primary",
             "value": {
               "type": "reload",
-              "prompt": data['prompt'],
+              "prompt": prompt,
             }
           }
         ]
