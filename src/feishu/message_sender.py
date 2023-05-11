@@ -1,10 +1,9 @@
 import json
-import time
 import attr
 from larksuiteoapi.api import Request, set_timeout
 from larksuiteoapi.service.im.v1 import Service as ImService, model
 from larksuiteoapi import Config, ACCESS_TOKEN_TYPE_TENANT, DOMAIN_FEISHU
-from util.app_config import app_config
+from util.event_helper import MyReceiveEvent
 from feishu.feishu_conf import feishu_conf
 from util.logger import app_logger
 
@@ -19,11 +18,15 @@ class MessageSender:
             raise Exception("conf is required")
         self.conf = conf
 
-    def send_text_message(self, chat_id, user_id, msg_id, msg):
+    def send_text_message(self, myevent: MyReceiveEvent, text):
+        chat_id = myevent.get_chat_id()
+        user_id = myevent.get_user_id()
+        msg_id = myevent.get_message_id()
+        
         body = {
             "chat_id": chat_id,
             "msg_type": "text",
-            "content": json.dumps({"text": f'<at user_id="{user_id}"></at> {msg}'}),
+            "content": json.dumps({"text": f'<at user_id="{user_id}"></at> {text}'}),
         }
         req = Request(
             f"/open-apis/im/v1/messages/{msg_id}/reply",
@@ -34,7 +37,7 @@ class MessageSender:
             request_opts=[set_timeout(3)],
         )
         resp = req.do(self.conf)
-        app_logger.debug("send_text_message:%s", msg)
+        app_logger.debug("send_text_message:%s", text)
         if resp.code == 0:
             # store the message in the chat history
             return True
@@ -48,11 +51,14 @@ class MessageSender:
             return False
 
     # 发送消息卡片
-    def send_message_card(self, chat_id, user_id, msg_id, messageCard):
+    def send_message_card(self, myevent: MyReceiveEvent, messageCard):
+        chat_id = myevent.get_chat_id()
+        user_id = myevent.get_user_id()
+        msg_id = myevent.get_message_id()
         body = {
             "chat_id": chat_id,
             "user_id": user_id,
-            "root_id": msg_id,
+            "parent_id": msg_id,
             "msg_type": "interactive",
             "card": messageCard,
         }
@@ -104,9 +110,4 @@ class MessageSender:
             )
             return False
 
-
-if __name__ == "__main__":
-    app_config.validate()
-    app_settings = Config.new_internal_app_settings_from_env()
-    conf = Config(DOMAIN_FEISHU, app_settings)
-    message_sender = MessageSender(conf)
+message_sender = MessageSender(feishu_conf)
