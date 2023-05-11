@@ -66,7 +66,7 @@ class MessageHandler:
         images_key = []
         for img_data in images_json['images']:
             images_key.append(upload_image(img_data))
-        return handle_image_card(images_json['info'], images_key)
+        return handle_image_card(images_json['info'], images_key, prompt)
 
     def handle_message(self, myevent: MyReceiveEvent):
         message_sender.send_text_message(myevent, f"正在生成图片，{sd_webui.queue()}")
