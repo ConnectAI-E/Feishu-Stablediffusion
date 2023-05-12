@@ -1,19 +1,19 @@
 # Note: The openai-python library support for Azure OpenAI is in preview.
-import requests, base64
+import requests, base64, io
 from util.app_config import app_config
 from util.logger import sd_logger, app_logger
 from service.generate_config import GenerateConfig
-
+from PIL import Image
 
 class StableDiffusionWebUI:
     def __init__(
         self,
         webui_url=app_config.WEBUI_URL,
-        headers={"accept": "application/json", "Content-Type": "application/json"},
+        headers={'accept': 'application/json', 'Content-Type': 'application/json'},
         webui_user=app_config.WEBUI_USER,
         webui_password=app_config.WEBUI_PASSWORD,
     ):
-        self.webui_url = webui_url.strip("/")
+        self.webui_url = webui_url.strip('/')
         self.headers = headers
         self.webui_user = webui_user
         self.webui_password = webui_password
@@ -21,12 +21,12 @@ class StableDiffusionWebUI:
     def send_api_request(
         self,
         endpoint,
-        method="GET",
+        method='GET',
         json=None,
         data=None,
         params=None,
     ):
-        url = f"{self.webui_url}{endpoint}"
+        url = f'{self.webui_url}{endpoint}'
         auth = (self.webui_user, self.webui_password)
         response = requests.request(method=method, url=url, headers=self.headers, json=json, data=data, params=params, auth=auth)
         response.raise_for_status()
@@ -36,7 +36,8 @@ class StableDiffusionWebUI:
     # Methods for displaying information
     def help(self):
         cmd_list = [
-            '不带/开头的默认为提示词，如果包含负提示词用"#"分开' '信息显示类命令：',
+            '不带/开头的默认为提示词，如果包含负提示词用"#"分开',
+            '信息显示类命令：',
             '/help          显示帮助',
             '/list_models   显示模型列表',
             '/list_samplers 显示采样器列表',
@@ -58,22 +59,22 @@ class StableDiffusionWebUI:
         return cmd_list
 
     def list_models(self):
-        models_endpoint = "/sdapi/v1/sd-models"
+        models_endpoint = '/sdapi/v1/sd-models'
         models = self.send_api_request(models_endpoint)
         return models
 
     def list_samplers(self):
-        models_endpoint = "/sdapi/v1/samplers"
+        models_endpoint = '/sdapi/v1/samplers'
         samplers = sd_webui.send_api_request(models_endpoint)
         return samplers
 
     def host_info(self):
-        memory_endpoint = "/sdapi/v1/memory"
+        memory_endpoint = '/sdapi/v1/memory'
         memory = self.send_api_request(memory_endpoint)
         return memory
 
     def queue(self):
-        queue_endpoint = "/queue/status"
+        queue_endpoint = '/queue/status'
         queue = sd_webui.send_api_request(queue_endpoint)
         queue_size = queue['queue_size']
         queue_eta = queue['queue_eta']
@@ -86,43 +87,94 @@ class StableDiffusionWebUI:
         print('Last {} log messages: ...')  # TODO: display last n log messages
 
     def set_options(self, options: dict):
-        options_endpoint = "/sdapi/v1/options"
-        self.send_api_request(options_endpoint, method="POST", json=options)
+        options_endpoint = '/sdapi/v1/options'
+        self.send_api_request(options_endpoint, method='POST', json=options)
         sd_logger.info(f'Set options {options}')
 
     def get_options(self) -> dict:
-        options_endpoint = "/sdapi/v1/options"
+        options_endpoint = '/sdapi/v1/options'
         options = self.send_api_request(options_endpoint)
         return options
 
     def set_model(self, model: str):
-        option_model = {"sd_model_checkpoint": model}
+        option_model = {'sd_model_checkpoint': model}
         self.set_options(option_model)
         sd_logger.info(f'Switched to model {model}')
 
     def get_model(self) -> str:
-        model = self.get_options()["sd_model_checkpoint"]
+        model = self.get_options()['sd_model_checkpoint']
         return model
 
-    def generate_images(self, gen_cfg):
-        endpoint = '/sdapi/v1/txt2img'
-        gen_cfg["n_iter"] = gen_cfg["batch_count"]
-        gen_cfg["sampler_name"] = gen_cfg["sampler"]
-        rjson = self.send_api_request(endpoint, method="POST", json=gen_cfg)
+    def parse_prompt_args(self, prompt):
+        result = {}
+        if prompt:
+            # Split the command line args into individual tokens
+            tokens = prompt.split()
+            i = 0
+            while i < len(tokens):
+                token = tokens[i]
+                if token.startswith("--"):
+                    # This is an option
+                    option_name = token[2:]
+                    if i + 1 < len(tokens) and not tokens[i + 1].startswith("--"):
+                        # The option has a value
+                        option_value = tokens[i + 1]
+                        result[option_name] = option_value
+                        i += 1
+                    else:
+                        # The option does not have a value
+                        result[option_name] = ""
+                else:
+                    # This is an argument
+                    if "prompt" in result:
+                        # Append to the existing prompt
+                        result["prompt"] += " " + token
+                    else:
+                        # Create a new prompt
+                        result["prompt"] = token
+                i += 1
+        return result
 
-        for i in range(len(rjson["images"])):
-            rjson["images"][i] = base64.b64decode(rjson["images"][i])
+    def txt2img(self, gen_cfg):
+        endpoint = '/sdapi/v1/txt2img'
+        gen_cfg['n_iter'] = gen_cfg['batch_count']
+        gen_cfg['sampler_name'] = gen_cfg['sampler']
+        rjson = self.send_api_request(endpoint, method='POST', json=gen_cfg)
+
+        for i in range(len(rjson['images'])):
+            rjson['images'][i] = self.base64_img(rjson['images'][i])
 
         return rjson
 
+    def img_base64(self, img):
+        img_base64 = base64.b64encode(img).decode(encoding='utf-8')
+        return 'data:image/png;base64,' + str(img_base64)
+
+    def base64_img(self, img_base64):
+        img = base64.b64decode(img_base64)
+        return img
+
     def img2img(self, img, gen_cfg):
         endpoint = '/sdapi/v1/img2img'
-        gen_cfg["n_iter"] = gen_cfg["batch_count"]
-        gen_cfg["sampler_name"] = gen_cfg["sampler"]
-        rjson = self.send_api_request(endpoint, method="POST", json=gen_cfg)
+        gen_cfg['n_iter'] = gen_cfg['batch_count']
+        gen_cfg['sampler_name'] = gen_cfg['sampler']
+        gen_cfg['init_images'] = [self.img_base64(img)]
+        rjson = self.send_api_request(endpoint, method='POST', json=gen_cfg)
+
+        for i in range(len(rjson['images'])):
+            rjson['images'][i] = self.base64_img(rjson['images'][i])
+
+        return rjson
 
     def interrogate(self, img):
-        return ''
+        endpoint = '/sdapi/v1/interrogate'
+        img_cfg = {
+            'image': self.img_base64(img),
+        }
+        rjson = self.send_api_request(endpoint, method='POST', json=img_cfg)
+        
+        return rjson
+
 
 
 sd_webui = StableDiffusionWebUI()
