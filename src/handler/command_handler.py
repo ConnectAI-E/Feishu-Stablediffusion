@@ -15,7 +15,8 @@ class CommandHandler:
         command = myevent.get_command()
 
         if command == 'help':
-            message_sender.send_text_message(myevent, sd_webui.help())
+            # message_sender.send_text_message(myevent, sd_webui.help())
+            message_sender.send_message_card(myevent,sd_webui.helpCard())
             app_logger.info(f"request /help")
         elif command == 'list_models':
             message_sender.send_text_message(myevent, sd_webui.list_models())

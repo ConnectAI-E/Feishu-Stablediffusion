@@ -5,6 +5,7 @@ from util.logger import sd_logger, app_logger
 from service.generate_config import GenerateConfig
 from PIL import Image
 
+
 class StableDiffusionWebUI:
     def __init__(
         self,
@@ -34,32 +35,40 @@ class StableDiffusionWebUI:
         return response.json()
 
     # Methods for displaying information
-    def help(self):
+    def helpCard(self):
         cmd_list = [
-            '不带/开头的默认为提示词，如果包含负提示词用"#"分开',
-            '信息显示类命令：',
-            '/help          显示帮助',
-            '/list_models   显示模型列表',
-            '/list_samplers 显示采样器列表',
-            '/host_info     显示主机信息',
-            '/queue         显示当前队列',
-            '/log n         显示最后n条日志',
-            '\n状态显示与设置类命令：',
-            '/model         显示或设置模型',
-            '/negative      显示或设置反提示词',
-            '/sampler       显示或设置采样器',
-            '/steps         显示或设置步数',
-            '/width         显示或设置宽度',
-            '/height        显示或设置高度',
-            '/batch_count   显示或设置批次数',
-            '/batch_size    显示或设置批次大小',
-            '/cfg           显示或设置CFG',
-            '/seed          显示或设置种子',
+            {"label": "显示模型列表", "cmd": "/list_models"},
+            {"label": "显示采样器列表", "cmd": "/list_samplers"},
+            {"label": "显示主机信息", "cmd": "/host_info"},
+            {"label": "显示当前队列", "cmd": "/queue"},
+            {"label": "显示最后n条日志", "cmd": "/log"},
+            {"label": "显示或设置模型", "cmd": "/model"},
+            {"label": "显示或设置反提示词", "cmd": "/negative"},
+            {"label": "显示或设置采样器", "cmd": "/sampler"},
+            {"label": "显示或设置步数", "cmd": "/steps"},
+            {"label": "显示或设置宽度", "cmd": "/width"},
+            {"label": "显示或设置高度", "cmd": "/height"},
+            {"label": "显示或设置批次数", "cmd": "/batch_count"},
+            {"label": "显示或设置批次大小", "cmd": "/batch_size"},
+            {"label": "显示或设置CFG", "cmd": "/cfg"},
+            {"label": "显示或设置种子'", "cmd": "/seed"},
         ]
-        return cmd_list
+
+        a = [
+            {"tag": "div", "text": {"content": "**我是SD-BOT，由stablediffusion赋能的图片机器人**", "tag": "lark_md"}},
+            {"tag": "hr"},
+            {"tag": "div", "text": {"content": "** 获取帮助**\n文本回复\"/help\"", "tag": "lark_md"}},
+            {"tag": "hr"},
+            {"tag": "div", "text": {"content": "**可用命令列表**", "tag": "lark_md"}},
+        ]
+
+        a.extend([{"tag": "div", "text": {"content": "**" + cmd.get('label') + "**\n文本回复\"" + cmd.get('cmd') + "\"", "tag": "lark_md"}} for cmd in cmd_list[:]]),
+        print(a)
+        help_card = {"elements": a, "header": {"template": "blue", "title": {"content": "🎒需要帮助吗？", "tag": "plain_text"}}}
+        return help_card
 
     def list_models(self):
-        models_endpoint = '/sdapi/v1/sd-models'
+        models_endpoint = "/sdapi/v1/sd-models"
         models = self.send_api_request(models_endpoint)
         return models
 
@@ -172,9 +181,8 @@ class StableDiffusionWebUI:
             'image': self.img_base64(img),
         }
         rjson = self.send_api_request(endpoint, method='POST', json=img_cfg)
-        
-        return rjson
 
+        return rjson
 
 
 sd_webui = StableDiffusionWebUI()
