@@ -6,19 +6,22 @@ from larksuiteoapi import Config, Context
 from typing import Any
 from handler.command_handler import CommandHandler
 from handler.message_handler import MessageHandler
-from util.app_config import app_config
-from feishu.feishu_conf import feishu_conf
-from util.event_helper import is_mention_bot, get_mention_message, get_pure_message
+from handler.image_handler import ImageHandler
+
+from util.event_helper import MyReceiveEvent
+from feishu.message_sender import message_sender
 
 from util.duplicate_filter import (
     event_is_processed,
     mark_event_processed,
     unmark_event_processed,
 )
-from util.logger import feishu_message_logger, app_logger
+from util.logger import feishu_logger, app_logger
 
-message_handler = MessageHandler(app_config, feishu_conf)
-command_handler = CommandHandler(app_config, feishu_conf)
+message_handler = MessageHandler()
+command_handler = CommandHandler()
+image_handler = ImageHandler()
+
 
 def route_im_message(ctx: Context, conf: Config, event: MessageReceiveEvent) -> Any:
     # ignore request if sender_type is not user
@@ -27,12 +30,6 @@ def route_im_message(ctx: Context, conf: Config, event: MessageReceiveEvent) -> 
     # ignore request if event_type is not im.message.receive_v1
     if event.header.event_type != "im.message.receive_v1":
         return
-    feishu_message_logger.info("Feishu message: %s", attr.asdict(event.event))
-
-    # ignore request if not mention bot in a group
-    if event.event.message.chat_type == "group":
-        if not is_mention_bot(event):
-            return
 
     if event_is_processed(event):
         app_logger.debug("Skip already processed: %s", attr.asdict(event.event))
@@ -42,19 +39,29 @@ def route_im_message(ctx: Context, conf: Config, event: MessageReceiveEvent) -> 
         app_logger.debug("Skip old event: %s", attr.asdict(event.event))
         return
 
+    myevent = MyReceiveEvent(event.event)
+    # ignore request if event is not group chat or not mentioned bot
+    if myevent.is_group_chat() and not myevent.is_mentioned_bot():
+        return
 
-    try:
-        done = False
-        message = get_pure_message(event)
+    feishu_logger.info("Feishu message: %s", attr.asdict(event))
 
-        # 带有 / 的消息是命令处理
-        if message.startswith("/"):
-            done = command_handler.handle_command(event)
-        # 否则都认为是图片的 prompt 信息处理
-        else:
-            done = message_handler.handle_message(event)
+    # ignore request if event has no content
+    if not myevent.has_content():
+        message_sender.send_text_message(myevent, '请发送包含文字或图片的消息')
+        feishu_logger.info("Skip event with no content:")
+        return
 
-        if done:
-            mark_event_processed(event)
-    except Exception as e:
-        app_logger.exception("Failed to handle message: %s", attr.asdict(event.event))
+    done = False
+
+    if myevent.image is None:
+        if myevent.text is not None:
+            if myevent.is_command_msg():
+                done = command_handler.handle_command(myevent)
+            else:
+                done = message_handler.handle_message(myevent)
+    else:
+        done = image_handler.handle_image(myevent)
+
+    if done:
+        mark_event_processed(event)

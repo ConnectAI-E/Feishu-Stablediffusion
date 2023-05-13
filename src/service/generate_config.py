@@ -301,9 +301,11 @@ class GenerateConfig:
     def set_alwayson_scripts(self, alwayson_scripts):
         self.alwayson_scripts = alwayson_scripts
 
-    def update_image_configuration(self, config, image_cfg):
+    def update_configuration(self, config, image_cfg):
         if 'prompt' in config:
             image_cfg.set_prompt(config['prompt'])
+        if 'negative_prompt' in config:
+            image_cfg.set_negative_prompt(config['negative_prompt'])
         if 'model' in config:
             image_cfg.set_model(config['model'])
         if 'sampler' in config:
