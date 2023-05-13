@@ -4,8 +4,6 @@ import attr
 from util.app_config import app_config
 from util.logger import app_logger
 from larksuiteoapi.service.im.v1.event import MessageReceiveEvent
-from larksuiteoapi.api import (Request)
-from larksuiteoapi import ACCESS_TOKEN_TYPE_TENANT
 
 
 

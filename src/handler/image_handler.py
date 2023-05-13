@@ -5,7 +5,9 @@ from util.event_helper import MyReceiveEvent
 from feishu.message_card import handle_image_card
 from service.generate_config import GenerateConfig
 from feishu.message_sender import message_sender
-
+from larksuiteoapi.api import (Request)
+from larksuiteoapi import ACCESS_TOKEN_TYPE_TENANT
+from feishu.feishu_conf import feishu_conf
 
 class ImageHandler:
     def __init__(self) -> None:
@@ -34,6 +36,18 @@ class ImageHandler:
         for img_data in images_json['images']:
             images_key.append(upload_image(img_data))
         return handle_image_card(images_json['info'], images_key, prompt)
+
+    def get_image_source(img_key, message_id):
+        body = {
+            "image_key": img_key,
+            "message_id": message_id
+        }
+        req = Request("/open-apis/im/v1/messages/" + message_id +'/resources/'+img_key + '?type=image', "GET", [ACCESS_TOKEN_TYPE_TENANT], body)
+        resp = req.do(feishu_conf)
+        if resp.code == 0:
+            return resp.data
+        else:
+            app_logger.debug(resp.msg)
 
     def handle_image(self, myevent: MyReceiveEvent):
         if myevent.image is None:
