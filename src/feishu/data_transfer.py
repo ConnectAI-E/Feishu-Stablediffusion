@@ -34,8 +34,21 @@ def upload_image(img_data):
     return None
 
 
-def get_image(img_key):
-    resp = img_service.images.get().set_image_key(img_key).do()
+def get_image(message_id,img_key):
+    # resp = img_service.images.get().set_image_key(img_key).do()
+    # app_logger.debug('request id = %s' % resp.get_request_id())
+    # app_logger.debug(resp)
+    # if resp.code == 0:
+    #     app_logger.debug(resp.data)
+    #     return resp.data
+    # else:
+    #     app_logger.debug(resp.msg)
+    #     app_logger.debug(resp.error)
+    # print(message_id)
+    # print(img_key)
+    # '// https://open.feishu.cn/document/uAjLw4CM/ukTMukTMukTM/reference/im-v1/message-resource/get''
+    req = Request('/im/v1/messages/'+message_id+'/resources/'+img_key+'?type=image', 'GET', [ACCESS_TOKEN_TYPE_TENANT], None)
+    resp = req.do(feishu_conf)
     app_logger.debug('request id = %s' % resp.get_request_id())
     app_logger.debug(resp)
     if resp.code == 0:
@@ -44,6 +57,7 @@ def get_image(img_key):
     else:
         app_logger.debug(resp.msg)
         app_logger.debug(resp.error)
+
 
     return None
 

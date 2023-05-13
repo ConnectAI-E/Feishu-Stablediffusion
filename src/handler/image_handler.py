@@ -39,7 +39,7 @@ class ImageHandler:
         if myevent.image is None:
             return False
 
-        img = get_image(myevent.image)
+        img = get_image(myevent.get_message_id(), myevent.image)
 
         if myevent.text is None:
             message_sender.send_text_message(myevent, f"正在以图生文，{sd_webui.queue()}")
