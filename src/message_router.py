@@ -54,7 +54,7 @@ def route_im_message(ctx: Context, conf: Config, event: MessageReceiveEvent) -> 
 
     done = False
 
-    if myevent.image is None:
+    if myevent.image_key is None:
         if myevent.text is not None:
             if myevent.is_command_msg():
                 done = command_handler.handle_command(myevent)

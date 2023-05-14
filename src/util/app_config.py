@@ -12,9 +12,10 @@ class AppConfig:
     APP_VERIFICATION_TOKEN: str
     BOT_NAME: str
     # endrequired
-
     HTTP_PORT: int
-    WEBUI_URL: str
+    
+    WEBUI_HOST: str
+    WEBUI_PORT: int
     WEBUI_USER: str
     WEBUI_PASSWORD: str
 
@@ -38,12 +39,14 @@ class AppConfig:
         if not self.HTTP_PORT:
             raise Exception('HTTP_PORT is required')
 
-        if not self.WEBUI_URL:
-            raise Exception('WEBUI_URL is required')
-        if not self.WEBUI_USER:
-            raise Exception('WEBUI_USER is required')
-        if not self.WEBUI_PASSWORD:
-            raise Exception('WEBUI_PASSWORD is required')
+        if not self.WEBUI_HOST:
+            raise Exception('WEBUI_HOST is required')
+        if not self.WEBUI_PORT:
+            raise Exception('WEBUI_PORT is required')
+        # if not self.WEBUI_USER:
+        #     raise Exception('WEBUI_USER is required')
+        # if not self.WEBUI_PASSWORD:
+        #     raise Exception('WEBUI_PASSWORD is required')
 
 
 def load_config():

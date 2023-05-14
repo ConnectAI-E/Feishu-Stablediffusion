@@ -39,8 +39,7 @@ def format_input_str(input_str, str_arr):
 
 def handle_image_card(image_info, img_key_list, prompt):
     split_datas = []
-    datas = json.loads(image_info)
-    for data in datas['infotexts']:
+    for data in image_info['infotexts']:
       split_datas.append('prompt: '+ data.replace('\n', ''))
 
     elements = [
