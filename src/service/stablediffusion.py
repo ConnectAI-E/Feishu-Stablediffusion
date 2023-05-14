@@ -2,37 +2,32 @@
 import requests, base64, io
 from util.app_config import app_config
 from util.logger import sd_logger, app_logger
-from service.generate_config import GenerateConfig
+from service.generate_config import TextToImageConfig
+import webuiapi
 from PIL import Image
+from io import BytesIO
 
 
 class StableDiffusionWebUI:
-    def __init__(
-        self,
-        webui_url=app_config.WEBUI_URL,
-        headers={'accept': 'application/json', 'Content-Type': 'application/json'},
-        webui_user=app_config.WEBUI_USER,
-        webui_password=app_config.WEBUI_PASSWORD,
-    ):
-        self.webui_url = webui_url.strip('/')
-        self.headers = headers
-        self.webui_user = webui_user
-        self.webui_password = webui_password
+    def __init__(self, webui_host, webui_port=7860, webui_user=None, webui_password=None):
+        self.webui_api = webuiapi.WebUIApi(webui_host, webui_port)
+        if webui_user is not None and webui_password is not None:
+            self.webui_api.set_auth(webui_user, webui_password)
 
-    def send_api_request(
-        self,
-        endpoint,
-        method='GET',
-        json=None,
-        data=None,
-        params=None,
-    ):
-        url = f'{self.webui_url}{endpoint}'
-        auth = (self.webui_user, self.webui_password)
-        response = requests.request(method=method, url=url, headers=self.headers, json=json, data=data, params=params, auth=auth)
-        response.raise_for_status()
+    # def send_api_request(
+    #     self,
+    #     endpoint,
+    #     method='GET',
+    #     json=None,
+    #     data=None,
+    #     params=None,
+    # ):
+    #     url = f'{self.webui_url}{endpoint}'
+    #     auth = (self.webui_user, self.webui_password)
+    #     response = requests.request(method=method, url=url, headers=self.headers, json=json, data=data, params=params, auth=auth)
+    #     response.raise_for_status()
 
-        return response.json()
+    #     return response.json()
 
     # Methods for displaying information
     def helpCard(self):
@@ -68,53 +63,45 @@ class StableDiffusionWebUI:
         return help_card
 
     def list_models(self):
-        models_endpoint = "/sdapi/v1/sd-models"
-        models = self.send_api_request(models_endpoint)
+        models = self.webui_api.get_sd_models()
         return models
 
     def list_samplers(self):
-        models_endpoint = '/sdapi/v1/samplers'
-        samplers = sd_webui.send_api_request(models_endpoint)
+        samplers = self.webui_api.get_samplers()
         return samplers
 
     def host_info(self):
-        memory_endpoint = '/sdapi/v1/memory'
-        memory = self.send_api_request(memory_endpoint)
+        memory_endpoint = 'memory'
+        memory = self.webui_api.custom_get(memory_endpoint, True)
         return memory
 
     def queue(self):
-        queue_endpoint = '/queue/status'
-        queue = sd_webui.send_api_request(queue_endpoint)
+        queue_endpoint = 'queue/status'
+        queue = self.webui_api.custom_get(queue_endpoint)
         queue_size = queue['queue_size']
         queue_eta = queue['queue_eta']
         queue_msg = f'队列中有[{queue_size}]个任务，预计还需要[{queue_eta}]秒'
+
         return queue_msg
 
     def log(self, n=5):
-        if n is None:
-            n = self.log_size
-        print('Last {} log messages: ...')  # TODO: display last n log messages
+        return 'logs\n' * n
 
     def set_options(self, options: dict):
-        options_endpoint = '/sdapi/v1/options'
-        self.send_api_request(options_endpoint, method='POST', json=options)
-        sd_logger.info(f'Set options {options}')
+        return self.webui_api.set_options(options)
 
     def get_options(self) -> dict:
-        options_endpoint = '/sdapi/v1/options'
-        options = self.send_api_request(options_endpoint)
+        options = self.webui_api.get_options()
         return options
 
     def set_model(self, model: str):
-        option_model = {'sd_model_checkpoint': model}
-        self.set_options(option_model)
-        sd_logger.info(f'Switched to model {model}')
+        self.webui_api.util_set_model(model)
 
     def get_model(self) -> str:
-        model = self.get_options()['sd_model_checkpoint']
+        model = self.webui_api.util_get_current_model()
         return model
 
-    def parse_prompt_args(self, prompt):
+    def parse_prompts_args(self, prompt):
         result = {}
         if prompt:
             # Split the command line args into individual tokens
@@ -125,6 +112,10 @@ class StableDiffusionWebUI:
                 if token.startswith("--"):
                     # This is an option
                     option_name = token[2:]
+                    if option_name == 'batch_count':
+                        option_name = 'n_iters'
+                    elif option_name == 'sampler':
+                        option_name = 'sampler_name'
                     if i + 1 < len(tokens) and not tokens[i + 1].startswith("--"):
                         # The option has a value
                         option_value = tokens[i + 1]
@@ -132,7 +123,7 @@ class StableDiffusionWebUI:
                         i += 1
                     else:
                         # The option does not have a value
-                        result[option_name] = ""
+                        result[option_name] = True
                 else:
                     # This is an argument
                     if "prompt" in result:
@@ -142,47 +133,25 @@ class StableDiffusionWebUI:
                         # Create a new prompt
                         result["prompt"] = token
                 i += 1
+            
+            prompts = result["prompt"].split('#', 1)
+            if len(prompts) > 1:
+                result['prompt'] = prompts[0]
+                result['negative_prompt'] = prompts[1]
+
         return result
 
     def txt2img(self, gen_cfg):
-        endpoint = '/sdapi/v1/txt2img'
-        gen_cfg['n_iter'] = gen_cfg['batch_count']
-        gen_cfg['sampler_name'] = gen_cfg['sampler']
-        rjson = self.send_api_request(endpoint, method='POST', json=gen_cfg)
+        result = self.webui_api.txt2img(**gen_cfg.get_as_json())
+        return result.__dict__
 
-        for i in range(len(rjson['images'])):
-            rjson['images'][i] = self.base64_img(rjson['images'][i])
-
-        return rjson
-
-    def img_base64(self, img):
-        img_base64 = base64.b64encode(img).decode(encoding='utf-8')
-        return 'data:image/png;base64,' + str(img_base64)
-
-    def base64_img(self, img_base64):
-        img = base64.b64decode(img_base64)
-        return img
-
-    def img2img(self, img, gen_cfg):
-        endpoint = '/sdapi/v1/img2img'
-        gen_cfg['n_iter'] = gen_cfg['batch_count']
-        gen_cfg['sampler_name'] = gen_cfg['sampler']
-        gen_cfg['init_images'] = [self.img_base64(img)]
-        rjson = self.send_api_request(endpoint, method='POST', json=gen_cfg)
-
-        for i in range(len(rjson['images'])):
-            rjson['images'][i] = self.base64_img(rjson['images'][i])
-
-        return rjson
+    def img2img(self, gen_cfg):
+        result = self.webui_api.img2img(**gen_cfg.get_as_json())
+        return result.__dict__
 
     def interrogate(self, img):
-        endpoint = '/sdapi/v1/interrogate'
-        img_cfg = {
-            'image': self.img_base64(img),
-        }
-        rjson = self.send_api_request(endpoint, method='POST', json=img_cfg)
-
-        return rjson
+        result = self.webui_api.interrogate(img)
+        return result.__dict__
 
 
-sd_webui = StableDiffusionWebUI()
+sd_webui = StableDiffusionWebUI(app_config.WEBUI_HOST, app_config.WEBUI_PORT, app_config.WEBUI_USER, app_config.WEBUI_PASSWORD)
