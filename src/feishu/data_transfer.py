@@ -3,6 +3,9 @@ from feishu.feishu_conf import feishu_conf
 from util.logger import app_logger
 import hashlib
 from larksuiteoapi.service.image.v4 import Service as ImageV4Service
+from larksuiteoapi.service.im.v1 import Service as ImV1Service
+import io
+from PIL import Image
 
 from larksuiteoapi.api import (
     Request,
@@ -15,11 +18,15 @@ from larksuiteoapi.api import (
 from larksuiteoapi import ACCESS_TOKEN_TYPE_TENANT
 
 img_service = ImageV4Service(feishu_conf)
+im_service = ImV1Service(feishu_conf)
+
 
 def upload_image(img_data):
+    buffered = io.BytesIO()
+    img_data.save(buffered, format="PNG")
     formData = FormData()
     formData.add_param('image_type', 'message')
-    formData.add_param('image', img_data)
+    formData.add_param('image', buffered.getvalue())
     req = Request('im/v1/images', 'POST', ACCESS_TOKEN_TYPE_TENANT, formData)
     resp = req.do(feishu_conf)
     app_logger.debug('request id = %s' % resp.get_request_id())
@@ -34,21 +41,8 @@ def upload_image(img_data):
     return None
 
 
-def get_image(message_id,img_key):
-    # resp = img_service.images.get().set_image_key(img_key).do()
-    # app_logger.debug('request id = %s' % resp.get_request_id())
-    # app_logger.debug(resp)
-    # if resp.code == 0:
-    #     app_logger.debug(resp.data)
-    #     return resp.data
-    # else:
-    #     app_logger.debug(resp.msg)
-    #     app_logger.debug(resp.error)
-    # print(message_id)
-    # print(img_key)
-    # '// https://open.feishu.cn/document/uAjLw4CM/ukTMukTMukTM/reference/im-v1/message-resource/get''
-    req = Request('/im/v1/messages/'+message_id+'/resources/'+img_key+'?type=image', 'GET', [ACCESS_TOKEN_TYPE_TENANT], None)
-    resp = req.do(feishu_conf)
+def get_image(img_key):
+    resp = img_service.images.get().set_image_key(img_key).do()
     app_logger.debug('request id = %s' % resp.get_request_id())
     app_logger.debug(resp)
     if resp.code == 0:
@@ -58,6 +52,19 @@ def get_image(message_id,img_key):
         app_logger.debug(resp.msg)
         app_logger.debug(resp.error)
 
+    return None
+
+
+def get_message_resource(message_id, res_key, res_type='image'):
+    resp = im_service.message_resources.get().set_message_id(message_id).set_file_key(res_key).set_type(res_type).do()
+    app_logger.debug('request id = %s' % resp.get_request_id())
+    app_logger.debug(resp)
+    if resp.code == 0:
+        app_logger.debug(resp.data)
+        return resp.data
+    else:
+        app_logger.debug(resp.msg)
+        app_logger.debug(resp.error)
 
     return None
 
