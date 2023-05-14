@@ -10,9 +10,9 @@ class MyReceiveEvent:
         event.message.content = json.loads(event.message.content)
         self.event_json = attr.asdict(event)
         self.text = None
-        self.image = None
-        self.audio = None
-        self.media = None
+        self.image_key = None
+        self.audio_key = None
+        self.media_key = None
 
         if self.get_message_type() == 'text':
             self.text = self.event.message.content['text']
@@ -21,13 +21,13 @@ class MyReceiveEvent:
                 if len(texts) == 2:
                     self.text = texts[1].strip()
         elif self.get_message_type() == 'image':
-            self.image = self.event.message.content['image_key']
+            self.image_key = self.event.message.content['image_key']
         elif self.get_message_type() == 'audio':
-            self.audio = self.event.message.content['file_key']
+            self.audio_key = self.event.message.content['file_key']
             self.audio_duration = self.event.message.content['duration']
         elif self.get_message_type() == 'media':
-            self.media = self.event.message.content['file_key']
-            self.media_image = self.event.message.content['image_key']
+            self.media_key = self.event.message.content['file_key']
+            self.media_image_key = self.event.message.content['image_key']
             self.media_file_name = self.event.message.content['file_name']
             self.media_duration = self.event.message.content['duration']
         elif self.get_message_type() == 'post':
@@ -40,15 +40,15 @@ class MyReceiveEvent:
                         if len(text) > 0:
                             self.text = text
                     elif tag['tag'] == 'img':
-                        self.image = tag['image_key']
+                        self.image_key = tag['image_key']
                         self.image_width = tag['width']
                         self.image_height = tag['height']
                     elif tag['tag'] == 'media':
-                        self.media = tag['file_key']
-                        self.media_image = tag['image_key']
+                        self.media_key = tag['file_key']
+                        self.media_image_key = tag['image_key']
 
     def has_content(self) -> bool:
-        return self.text is not None or self.image is not None or self.audio is not None or self.media is not None
+        return self.text is not None or self.image_key is not None or self.audio_key is not None or self.media_key is not None
 
     def is_mentioned(self, name: str) -> bool:
         if self.event.message.mentions is None:
@@ -116,3 +116,6 @@ class MyReceiveEvent:
 
     def get_union_id(self) -> str:
         return self.event.sender.sender_id.union_id
+    
+    def get_tenant_key(self) -> str:
+        return self.event.sender.tenant_key
