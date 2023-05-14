@@ -12,6 +12,8 @@ HTTP_PORT: 9000
 HTTPS_PORT: 9001
 
 # Stable Diffusion WebU的地址，启动参数中要加入--api
-WEBUI_URL: https://xxx/
-WEBUI_USER: user
-WEBUI_PASSWORD: password
+WEBUI_HOST: IP or Domain
+WEBUI_PORT: 7860
+# 如果参数启用了API认证"--api-auth user:pwd"，需要填写用户名和密码
+# WEBUI_USER: user
+# WEBUI_PASSWORD: password
