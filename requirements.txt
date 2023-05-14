@@ -1,3 +1,4 @@
 larksuite-oapi
 flask
 PyYAML
+webuiapi
