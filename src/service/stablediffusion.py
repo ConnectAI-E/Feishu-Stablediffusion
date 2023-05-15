@@ -76,11 +76,11 @@ class StableDiffusionWebUI:
         return memory
 
     def queue(self):
-        queue_endpoint = 'queue/status'
-        queue = self.webui_api.custom_get(queue_endpoint)
-        queue_size = queue['queue_size']
-        queue_eta = queue['queue_eta']
-        queue_msg = f'队列中有[{queue_size}]个任务，预计还需要[{queue_eta}]秒'
+        queue = self.webui_api.get_progress()
+        queue_size = queue['state']['job_count']
+        queue_progress = float(queue['progress'])*100
+        queue_eta = int(queue['eta_relative'])
+        queue_msg = f'队列中有[{queue_size}]个任务，当前任务进度[{queue_progress}%]，预计还需要[{queue_eta}]秒'
 
         return queue_msg
 
