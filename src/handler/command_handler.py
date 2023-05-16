@@ -34,10 +34,10 @@ class CommandHandler:
             model = myevent.get_command_args()
             if model is None:
                 model = sd_webui.get_model()
-                message_sender.send_text_message(myevent, f'当前模型为"{model}"')
+                message_sender.send_text_message(myevent, f'当前模型为: [{model}]')
             else:
                 sd_webui.set_model(model)
-                message_sender.send_text_message(myevent, f'切换模型为"{model}"')
+                message_sender.send_text_message(myevent, f'切换模型为: [{model}]')
         else:
             message_sender.send_text_message(myevent, "未知命令 /help 查看帮助")
             app_logger.info("unknown command")

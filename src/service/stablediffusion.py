@@ -2,17 +2,22 @@
 import requests, base64, io
 from util.app_config import app_config
 from util.logger import sd_logger, app_logger
-from service.generate_config import TextToImageConfig
+from service.generate_config import TextToImageConfig, ImageToImageConfig
 import webuiapi
 from PIL import Image
 from io import BytesIO
+from util.sys_info import SystemInfo
 
 
 class StableDiffusionWebUI:
-    def __init__(self, webui_host, webui_port=7860, webui_user=None, webui_password=None):
-        self.webui_api = webuiapi.WebUIApi(webui_host, webui_port)
+    def __init__(self, webui_host, webui_port=7860, webui_user=None, webui_password=None, use_https=False):
+        self.webui_api = webuiapi.WebUIApi(host=webui_host, port=webui_port, use_https=use_https)
         if webui_user is not None and webui_password is not None:
             self.webui_api.set_auth(webui_user, webui_password)
+
+        self.txt2img_config = TextToImageConfig()
+        self.img2img_config = ImageToImageConfig()
+        self.sys_info = SystemInfo()
 
     # def send_api_request(
     #     self,
@@ -72,13 +77,29 @@ class StableDiffusionWebUI:
 
     def host_info(self):
         memory_endpoint = 'memory'
+        '''
+        {'ram': {'free': 370587762688.00006, 'used': 947437568, 'total': 371535200256.00006}, 
+        'cuda': {'system': {'free': 22938451968, 'used': 2499674112, 'total': 25438126080}, 
+        'active': {'current': 2169358848, 'peak': 2169358848}, 'allocated': {'current': 2169358848, 'peak': 2169358848}, 
+        'reserved': {'current': 2183135232, 'peak': 2183135232}, 'inactive': {'current': 13776384, 'peak': 77782016}, 'events': {'retries': 0, 'oom': 0}}}
+        '''
         memory = self.webui_api.custom_get(memory_endpoint, True)
-        return memory
+        onem = 1024 ** 2
+        ram_total = int(memory['ram']['total']) // onem
+        ram_free = int(memory['ram']['free']) // onem
+        ram_used = int(memory['ram']['used']) // onem
+        gpu_ram_total = int(memory['cuda']['system']['total']) // onem
+        gpu_ram_free = int(memory['cuda']['system']['free']) // onem
+        gpu_ram_used = int(memory['cuda']['system']['used']) // onem
+        
+        memory_msg = f'内存：总共[{ram_total}]MB，已用[{ram_used}]MB，剩余[{ram_free}]MB\n显存：总共[{gpu_ram_total}]MB，已用[{gpu_ram_used}]MB，剩余[{gpu_ram_free}]MB'
+        
+        return memory_msg
 
     def queue(self):
         queue = self.webui_api.get_progress()
         queue_size = queue['state']['job_count']
-        queue_progress = float(queue['progress'])*100
+        queue_progress = float(queue['progress']) * 100
         queue_eta = int(queue['eta_relative'])
         queue_msg = f'队列中有[{queue_size}]个任务，当前任务进度[{queue_progress}%]，预计还需要[{queue_eta}]秒'
 
@@ -133,7 +154,7 @@ class StableDiffusionWebUI:
                         # Create a new prompt
                         result["prompt"] = token
                 i += 1
-            
+
             prompts = result["prompt"].split('#', 1)
             if len(prompts) > 1:
                 result['prompt'] = prompts[0]
@@ -154,4 +175,4 @@ class StableDiffusionWebUI:
         return result.__dict__
 
 
-sd_webui = StableDiffusionWebUI(app_config.WEBUI_HOST, app_config.WEBUI_PORT, app_config.WEBUI_USER, app_config.WEBUI_PASSWORD)
+sd_webui = StableDiffusionWebUI(app_config.WEBUI_HOST, app_config.WEBUI_PORT, app_config.WEBUI_USER, app_config.WEBUI_PASSWORD, app_config.WEBUI_USE_HTTPS)
