@@ -46,10 +46,10 @@
 后续看时间加入img2img, clip, controlnet等功能
 
 ## 飞书机器人基础环境搭建
-1. 将config-example.yml复制为config.yml
-2. 编辑config.yml，添加机器人以及StableDiffusionWebUI的服务器信息
-3. （可选）创建Python虚拟环境python3 -m venv .venv && source .venv/bin/activate
-4. 安装要求pip install -r requirements.txt，运行python3 src/main.py。
+1. 将config-example.yml复制为config.yml；
+2. 编辑config.yml，添加机器人以及StableDiffusionWebUI的服务器信息；
+3. （可选）创建Python虚拟环境python3 -m venv .venv && source .venv/bin/activate；
+4. 安装依赖库pip install -r requirements.txt，然后运行python3 src/main.py；
 
 ## 操作方式
 
@@ -57,19 +57,34 @@
 * 只发文件消息为txt2img，消息内容作为prompt和参数
 * 发图片带文字为img2img，图片为基图，文字为prompt和参数
 * 只发图片为img2txt，返回图片识别的内容
-* 
-* **命令：**
 
-1. /help 显示帮助；
-2. /list_models 显示可用的模型；
-3. /list_sampler 显示可用的采样器;
-4. /list_upscalers
-5. /host_info 显示最大内存，可用内存，最大显存，可用显存；
-6. /quene 查询当前生成队列里的工作数；
+## 操作命令
+* 不带参数的：
+1. /help 		显示帮助；
+2. /list_models 	显示可用的模型；
+3. /list_sampler 	显示可用的采样器;
+4. /list_upscalers 	显示可用的放大器；
+5. /host_info 		显示最大内存，可用内存，最大显存，可用显存；
+6. /quene 		查询当前生成队列里的任务情况；
+7. /model		显示当前模型
 
-* **设置默认参数的命令，不带参数为显示当前默认参数。同时也可以把“/”换成“--”作为prompt中的参数，单次使用：**
+* 带参数的：
+1. /model str 		设置StableDiffuion模型；
 
-1. /model 设置SD模型；
-2. /sampler 设置采样器，默认"Euler a"；
-3. /steps 设置采样步数，默认20；
+## 设置关键词，bool类型的不用带参数，写了就是True：
+1. --sampler str 	设置采样器，默认"Euler a"；
+2. --steps int 		设置采样步数，默认20；
+3. --width int		设置宽度，默认512；
+4. --height int 	设置高度，默认512；
+5. --batch_size int	设置批次大小，默认为1；
+6. --batch_count int 	设置批次数量，默认为1；
+7. --seed int 		设置种子，默认为-1；
+8. --cfg_scale float 	设置CFG大小，用来设置提示词的控制度，默认为7.0；
+9. --restore_faces 	设置是否修复面容，默认为False；
+10. --enable_hr 	设置是否高清修复，默认为False；
+11. --hr_upscaler str 	设置放大器，默认为Latent；
+12. --hr_scale flat 	设置放大倍率，默认为2；
+13. --denoising_strength float	设置重绘强度，默认为0.7；
+14. --resize_mode int 	设置缩放模式，默认为0；
+15. --image_cfg_scale float 	设置Img2Img时原图的控制度；
 
