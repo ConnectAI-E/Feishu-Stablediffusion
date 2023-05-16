@@ -18,16 +18,20 @@ class MessageSender:
             raise Exception("conf is required")
         self.conf = conf
 
-    def send_text_message(self, myevent: MyReceiveEvent, text):
+    def send_text_message(self, myevent: MyReceiveEvent, text, mention_user = False):
         chat_id = myevent.get_chat_id()
         user_id = myevent.get_user_id()
         msg_id = myevent.get_message_id()
         
         body = {
             "chat_id": chat_id,
-            "msg_type": "text",
-            "content": json.dumps({"text": f'<at user_id="{user_id}"></at> {text}'}),
+            "msg_type": "text"
         }
+        if mention_user:
+            body["content"] = json.dumps({"text": f'<at user_id="{user_id}"></at> \n{text}'})
+        else:
+            body["content"] = json.dumps({"text": text})
+        
         req = Request(
             f"/open-apis/im/v1/messages/{msg_id}/reply",
             "POST",
