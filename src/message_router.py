@@ -54,14 +54,17 @@ def route_im_message(ctx: Context, conf: Config, event: MessageReceiveEvent) -> 
 
     done = False
 
-    if myevent.image_key is None:
-        if myevent.text is not None:
-            if myevent.is_command_msg():
-                done = command_handler.handle_command(myevent)
-            else:
-                done = message_handler.handle_message(myevent)
-    else:
-        done = image_handler.handle_image(myevent)
+    try:
+        if myevent.image_key is None:
+            if myevent.text is not None:
+                if myevent.is_command_msg():
+                    done = command_handler.handle_command(myevent)
+                else:
+                    done = message_handler.handle_message(myevent)
+        else:
+            done = image_handler.handle_image(myevent)
 
-    if done:
-        mark_event_processed(event)
+        if done:
+            mark_event_processed(event)
+    except Exception as e:
+        message_sender.send_text_message(myevent, f'发生错误: {e}', True)
