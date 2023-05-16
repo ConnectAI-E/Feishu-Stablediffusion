@@ -16,6 +16,7 @@ class AppConfig:
     
     WEBUI_HOST: str
     WEBUI_PORT: int
+    WEBUI_USE_HTTPS: bool
     WEBUI_USER: str
     WEBUI_PASSWORD: str
 
@@ -43,6 +44,8 @@ class AppConfig:
             raise Exception('WEBUI_HOST is required')
         if not self.WEBUI_PORT:
             raise Exception('WEBUI_PORT is required')
+        if not self.WEBUI_USE_HTTPS:
+            raise Exception('WEBUI_HTTPS is required')
         # if not self.WEBUI_USER:
         #     raise Exception('WEBUI_USER is required')
         # if not self.WEBUI_PASSWORD:
