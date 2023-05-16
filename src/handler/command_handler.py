@@ -24,6 +24,13 @@ class CommandHandler:
         elif command == 'list_samplers':
             message_sender.send_text_message(myevent, sd_webui.list_samplers())
             app_logger.info(f"/sdapi/v1/samplers")
+        elif command == 'list_upscalers':
+            message_sender.send_text_message(myevent, sd_webui.list_upscalers())
+            app_logger.info(f"/sdapi/v1/upscalers")
+        elif command == 'refresh_models':
+            sd_webui.refresh_models()
+            message_sender.send_text_message(myevent, '模型列表已刷新')
+            app_logger.info(f"/sdapi/v1/refresh-models")
         elif command == 'host_info':
             message_sender.send_text_message(myevent, sd_webui.host_info())
             app_logger.info(f"/sdapi/v1/samplers")
@@ -39,7 +46,7 @@ class CommandHandler:
                 sd_webui.set_model(model)
                 message_sender.send_text_message(myevent, f'切换模型为: [{model}]')
         else:
-            message_sender.send_text_message(myevent, "未知命令 /help 查看帮助")
+            message_sender.send_text_message(myevent, "未知命令，请使用 /help 查看帮助")
             app_logger.info("unknown command")
             
         return True

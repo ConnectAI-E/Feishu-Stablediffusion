@@ -6,7 +6,6 @@ from service.generate_config import TextToImageConfig, ImageToImageConfig
 import webuiapi
 from PIL import Image
 from io import BytesIO
-from util.sys_info import SystemInfo
 
 
 class StableDiffusionWebUI:
@@ -17,7 +16,6 @@ class StableDiffusionWebUI:
 
         self.txt2img_config = TextToImageConfig()
         self.img2img_config = ImageToImageConfig()
-        self.sys_info = SystemInfo()
 
     # def send_api_request(
     #     self,
@@ -41,17 +39,7 @@ class StableDiffusionWebUI:
             {"label": "显示采样器列表", "cmd": "/list_samplers"},
             {"label": "显示主机信息", "cmd": "/host_info"},
             {"label": "显示当前队列", "cmd": "/queue"},
-            {"label": "显示最后n条日志", "cmd": "/log"},
             {"label": "显示或设置模型", "cmd": "/model"},
-            {"label": "显示或设置反提示词", "cmd": "/negative"},
-            {"label": "显示或设置采样器", "cmd": "/sampler"},
-            {"label": "显示或设置步数", "cmd": "/steps"},
-            {"label": "显示或设置宽度", "cmd": "/width"},
-            {"label": "显示或设置高度", "cmd": "/height"},
-            {"label": "显示或设置批次数", "cmd": "/batch_count"},
-            {"label": "显示或设置批次大小", "cmd": "/batch_size"},
-            {"label": "显示或设置CFG", "cmd": "/cfg"},
-            {"label": "显示或设置种子'", "cmd": "/seed"},
         ]
 
         a = [
@@ -69,31 +57,48 @@ class StableDiffusionWebUI:
 
     def list_models(self):
         models = self.webui_api.get_sd_models()
-        return models
+        models_list_txt = f'共有[{len(models)}]个模型\n'
+        for model_info in models:
+            model_name = model_info['model_name']
+            model_hash = model_info['hash']
+            models_list_txt = f'{models_list_txt}模型：{model_name}\t\tHash：{model_hash}\n'
+
+        return models_list_txt
 
     def list_samplers(self):
         samplers = self.webui_api.get_samplers()
-        return samplers
+        samplers_list_txt = f'共有[{len(samplers)}]个采样器\n'
+        for sampler_info in samplers:
+            sampler_name = sampler_info['name']
+            samplers_list_txt = f'{samplers_list_txt}采样器：{sampler_name}\n'
 
+        return samplers_list_txt
+
+    def list_upscalers(self):
+        upscalers = self.webui_api.get_upscalers()
+        upscalers_list_txt = f'共有[{len(upscalers)}]个放大器\n'
+        for upscaler_info in upscalers:
+            upscaler_name = upscaler_info['name']
+            upscalers_list_txt = f'{upscalers_list_txt}放大器：{upscaler_name}\n'
+
+        return upscalers_list_txt
+
+    def refresh_models(self):
+        self.webui_api.refresh_checkpoints()
+        
     def host_info(self):
         memory_endpoint = 'memory'
-        '''
-        {'ram': {'free': 370587762688.00006, 'used': 947437568, 'total': 371535200256.00006}, 
-        'cuda': {'system': {'free': 22938451968, 'used': 2499674112, 'total': 25438126080}, 
-        'active': {'current': 2169358848, 'peak': 2169358848}, 'allocated': {'current': 2169358848, 'peak': 2169358848}, 
-        'reserved': {'current': 2183135232, 'peak': 2183135232}, 'inactive': {'current': 13776384, 'peak': 77782016}, 'events': {'retries': 0, 'oom': 0}}}
-        '''
         memory = self.webui_api.custom_get(memory_endpoint, True)
-        onem = 1024 ** 2
+        onem = 1024**2
         ram_total = int(memory['ram']['total']) // onem
         ram_free = int(memory['ram']['free']) // onem
         ram_used = int(memory['ram']['used']) // onem
         gpu_ram_total = int(memory['cuda']['system']['total']) // onem
         gpu_ram_free = int(memory['cuda']['system']['free']) // onem
         gpu_ram_used = int(memory['cuda']['system']['used']) // onem
-        
+
         memory_msg = f'内存：总共[{ram_total}]MB，已用[{ram_used}]MB，剩余[{ram_free}]MB\n显存：总共[{gpu_ram_total}]MB，已用[{gpu_ram_used}]MB，剩余[{gpu_ram_free}]MB'
-        
+
         return memory_msg
 
     def queue(self):
@@ -104,9 +109,6 @@ class StableDiffusionWebUI:
         queue_msg = f'队列中有[{queue_size}]个任务，当前任务进度[{queue_progress}%]，预计还需要[{queue_eta}]秒'
 
         return queue_msg
-
-    def log(self, n=5):
-        return 'logs\n' * n
 
     def set_options(self, options: dict):
         return self.webui_api.set_options(options)
@@ -159,6 +161,8 @@ class StableDiffusionWebUI:
             if len(prompts) > 1:
                 result['prompt'] = prompts[0]
                 result['negative_prompt'] = prompts[1]
+            if 'model' in result:
+                self.set_model(result['model'])
 
         return result
 
