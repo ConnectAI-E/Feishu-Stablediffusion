@@ -7,7 +7,8 @@
     <br>
     <p align='center'>
     <h1>Txt2Img：文生图</h1>
-       <img width="1000" alt="image" src="https://github.com/ConnectAI-E/Feishu-Stablediffusion/assets/16874002/095bcda9-41b7-4879-b8ec-ae844bc587af">
+       <img width="1000" alt="image" src="https://github.com/ConnectAI-E/Feishu-Stablediffusion/assets/16874002/af5e0beb-dbf7-4f5a-b34c-1d9b0b6976cd">
+        <img width="1000" alt="image" src="https://github.com/ConnectAI-E/Feishu-Stablediffusion/assets/16874002/374c8f91-3662-4aaf-8f57-c8decb8771ce">
     <h1>Img2Txt：图生文</h1>
         <img width="1000" alt="image" src="https://github.com/ConnectAI-E/Feishu-Stablediffusion/assets/16874002/88922eb8-89f5-40e8-ab7f-42317296ba29">
     <h1>Img2Img：图生图</h1>
