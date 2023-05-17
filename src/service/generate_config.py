@@ -1,6 +1,7 @@
 from webuiapi import HiResUpscaler, ControlNetUnit
 from typing import List, Dict, Any
 from feishu.message_card import LIST_INFO_CARD, handle_list_info_card
+import translators as ts
 
 
 class GenerateConfig:
@@ -13,6 +14,12 @@ class GenerateConfig:
                 setattr(self, key, json[key])
             else:
                 print(f'Unknown key {key} in json')
+
+    def translate_to_english(self):
+        if len(self.prompt) > 0:
+            self.prompt = ts.translate_text(query_text=self.prompt, translator='alibaba', from_language='auto', to_language='en')
+        if len(self.negative_prompt) > 0:
+            self.negative_prompt = ts.translate_text(query_text=self.negative_prompt, translator='alibaba', from_language='auto', to_language='en')
 
 
 class TextToImageConfig(GenerateConfig):
@@ -41,7 +48,7 @@ class TextToImageConfig(GenerateConfig):
         cfg_scale=7.0,
         width=512,
         height=512,
-        restore_faces=False,
+        restore_faces=True,
         tiling=False,
         do_not_save_samples=False,
         do_not_save_grid=False,
@@ -135,7 +142,7 @@ class ImageToImageConfig(GenerateConfig):
         cfg_scale=7.0,
         width=512,
         height=512,
-        restore_faces=False,
+        restore_faces=True,
         tiling=False,
         do_not_save_samples=False,
         do_not_save_grid=False,

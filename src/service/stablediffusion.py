@@ -10,7 +10,7 @@ from io import BytesIO
 
 class StableDiffusionWebUI:
     def __init__(self, webui_host, webui_port=7860, webui_user=None, webui_password=None, use_https=False):
-        self.webui_api = webuiapi.WebUIApi(host=webui_host, port=webui_port, use_https=use_https)
+        self.webui_api = webuiapi.WebUIApi(host=webui_host, port=webui_port, use_https=use_https, steps=25)
         if webui_user is not None and webui_password is not None:
             self.webui_api.set_auth(webui_user, webui_password)
 
@@ -166,11 +166,13 @@ class StableDiffusionWebUI:
 
         return result
 
-    def txt2img(self, gen_cfg):
+    def txt2img(self, gen_cfg: TextToImageConfig):
+        gen_cfg.translate_to_english()
         result = self.webui_api.txt2img(**gen_cfg.get_as_json())
         return result.__dict__
 
-    def img2img(self, gen_cfg):
+    def img2img(self, gen_cfg: ImageToImageConfig):
+        gen_cfg.translate_to_english()
         result = self.webui_api.img2img(**gen_cfg.get_as_json())
         return result.__dict__
 
