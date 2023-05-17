@@ -1,5 +1,5 @@
 <p align='center'>
-<h1>古人云：道生一，一生二，二生StableDiffuion，StableDiffusion生万物</h1>
+<h3>古人云：道生一，一生二，二生StableDiffuion，StableDiffusion生万物</h2>
 <img width="1000" alt="image" src="https://github.com/ConnectAI-E/Feishu-Stablediffusion/assets/16874002/9c9233e5-6a3e-42e4-b562-760af22143ec">
 
 <!-- <details align='center'> -->
