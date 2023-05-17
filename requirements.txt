@@ -2,3 +2,4 @@ larksuite-oapi
 flask
 PyYAML
 webuiapi
+translators
