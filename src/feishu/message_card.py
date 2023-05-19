@@ -62,7 +62,7 @@ def handle_infotexts(obj):
     # 格式化字符串
     formatted_str = format_input_str('', obj.keys())
     for key, value in obj.items():
-        formatted_str += '\n **【' + key + '】** ' + str(value)
+        formatted_str += '\n **【' + key + '】** ' + str(value).replace('&lt;', ' &lt ').replace('&gt;', ' &gt ').replace('&amp;', ' &amp ')
 
     return formatted_str
 
