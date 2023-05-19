@@ -129,22 +129,23 @@ class StableDiffusionWebUI:
         # 使用正则表达式匹配格式为 "--单词 [值]" 的文本
         matches = re.findall(r'--\b\w+\b\s*\[[^\[\]]+\]', prompt)
         result = {}
-        for match in matches:
-            option_match = re.findall(r'--\b\w+\b\s*\[[^\[\]]+\]', match)
-        for option in option_match:
-            if '--' in option:
-                option_name = option.split('--', 1)[1].split(' ', 1)[0]
-                option_value = option.split('[', 1)[1].split(']', 1)[0]
+        if len(matches) > 0 :
+            for match in matches:
+                option_match = re.findall(r'--\b\w+\b\s*\[[^\[\]]+\]', match)
+            for option in option_match:
+                if '--' in option:
+                    option_name = option.split('--', 1)[1].split(' ', 1)[0]
+                    option_value = option.split('[', 1)[1].split(']', 1)[0]
 
-                if option_name == 'batch_count':
-                    option_name = 'n_iters'
-                elif option_name == 'sampler':
-                    option_name = 'sampler_name'
+                    if option_name == 'batch_count':
+                        option_name = 'n_iters'
+                    elif option_name == 'sampler':
+                        option_name = 'sampler_name'
 
-                result[option_name] = option_value
-                
-                # 将匹配到的文本替换为空字符串
-                prompt = re.sub(re.escape(option), '', prompt)
+                    result[option_name] = option_value
+
+                    # 将匹配到的文本替换为空字符串
+                    prompt = re.sub(re.escape(option), '', prompt)
     
         # 将转换后的字典添加到原字典中
         text_dict = {'prompt': prompt}
