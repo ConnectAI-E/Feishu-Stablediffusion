@@ -6,6 +6,7 @@ from service.generate_config import TextToImageConfig, ImageToImageConfig
 import webuiapi
 from PIL import Image
 from io import BytesIO
+import re
 
 
 class StableDiffusionWebUI:
@@ -125,46 +126,30 @@ class StableDiffusionWebUI:
         return model
 
     def parse_prompts_args(self, prompt):
+        # 使用正则表达式匹配格式为 "--单词 [值]" 的文本
+        matches = re.findall(r'--\b\w+\b\s*\[[^\[\]]+\]', prompt)
         result = {}
-        if prompt:
-            # Split the command line args into individual tokens
-            tokens = prompt.split()
-            i = 0
-            while i < len(tokens):
-                token = tokens[i]
-                if token.startswith("--"):
-                    # This is an option
-                    option_name = token[2:]
-                    if option_name == 'batch_count':
-                        option_name = 'n_iters'
-                    elif option_name == 'sampler':
-                        option_name = 'sampler_name'
-                    if i + 1 < len(tokens) and not tokens[i + 1].startswith("--"):
-                        # The option has a value
-                        option_value = tokens[i + 1]
-                        result[option_name] = option_value
-                        i += 1
-                    else:
-                        # The option does not have a value
-                        result[option_name] = True
-                else:
-                    # This is an argument
-                    if "prompt" in result:
-                        # Append to the existing prompt
-                        result["prompt"] += " " + token
-                    else:
-                        # Create a new prompt
-                        result["prompt"] = token
-                i += 1
+        for match in matches:
+            option_match = re.findall(r'--\b\w+\b\s*\[[^\[\]]+\]', match)
+        for option in option_match:
+            if '--' in option:
+                option_name = option.split('--', 1)[1].split(' ', 1)[0]
+                option_value = option.split('[', 1)[1].split(']', 1)[0]
 
-            prompts = result["prompt"].split('#', 1)
-            if len(prompts) > 1:
-                result['prompt'] = prompts[0]
-                result['negative_prompt'] = prompts[1]
-            if 'model' in result:
-                self.set_model(result['model'])
+                if option_name == 'batch_count':
+                    option_name = 'n_iters'
+                elif option_name == 'sampler':
+                    option_name = 'sampler_name'
 
-        return result
+                result[option_name] = option_value
+                
+                # 将匹配到的文本替换为空字符串
+                prompt = re.sub(re.escape(option), '', prompt)
+    
+        # 将转换后的字典添加到原字典中
+        text_dict = {'prompt': prompt}
+        text_dict.update(result)
+        return text_dict
 
     def txt2img(self, gen_cfg: TextToImageConfig):
         gen_cfg.translate_to_english()
