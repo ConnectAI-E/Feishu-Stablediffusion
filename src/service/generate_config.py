@@ -2,7 +2,7 @@ from webuiapi import HiResUpscaler, ControlNetUnit
 from typing import List, Dict, Any
 from feishu.message_card import LIST_INFO_CARD, handle_list_info_card
 import translators as ts
-
+import html
 
 class GenerateConfig:
     def get_as_json(self) -> dict:
@@ -17,7 +17,7 @@ class GenerateConfig:
 
     def translate_to_english(self):
         if len(self.prompt) > 0:
-            self.prompt = ts.translate_text(query_text=self.prompt, translator='alibaba', from_language='auto', to_language='en')
+            self.prompt = html.unescape(ts.translate_text(query_text=self.prompt, translator='alibaba', from_language='auto', to_language='en'))
         if len(self.negative_prompt) > 0:
             self.negative_prompt = ts.translate_text(query_text=self.negative_prompt, translator='alibaba', from_language='auto', to_language='en')
 

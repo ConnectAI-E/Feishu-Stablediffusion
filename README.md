@@ -86,7 +86,8 @@
 | /model | str  | 设置 StableDiffuion 模型 |  |
 
 ## 设置关键词:
-
+- 使用关键词的格式--key [value] 
+  - eg:  --sampler [DPM++ 2S a Karras] --size [512x512]
 (*bool 类型的不用带参数，写了就是 True*)
 
 | 参数                 | 类型  | 功能                        | 默认值    |
