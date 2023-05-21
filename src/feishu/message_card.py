@@ -52,7 +52,7 @@ def handle_infotexts(obj):
     del obj['is_using_inpainting_conditioning']
     del obj['index_of_first_image']
 
-    obj['model'] = [model_info]
+    obj['model'] = model_info
 
     def format_input_str(input_str, str_arr):
       for key in str_arr:
@@ -62,7 +62,7 @@ def handle_infotexts(obj):
     # 格式化字符串
     formatted_str = format_input_str('', obj.keys())
     for key, value in obj.items():
-        formatted_str += '\n **【' + key + '】** ' + str(value).replace('&lt;', ' &lt ').replace('&gt;', ' &gt ').replace('&amp;', ' &amp ')
+        formatted_str += '\n **【' + key + '】** ' + str(value).replace('<', ' &lt ').replace('>', ' &gt ')
 
     return formatted_str
 

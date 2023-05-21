@@ -4,6 +4,7 @@ from feishu.message_card import LIST_INFO_CARD, handle_list_info_card
 import translators as ts
 import html
 
+
 class GenerateConfig:
     def get_as_json(self) -> dict:
         return self.__dict__
@@ -15,11 +16,14 @@ class GenerateConfig:
             else:
                 print(f'Unknown key {key} in json')
 
-    def translate_to_english(self):
+    def translate_to_english(self, translator='alibaba'):
+        def translate(text):
+            return html.unescape(ts.translate_text(query_text=text, translator=translator, from_language='auto', to_language='en'))
+        
         if len(self.prompt) > 0:
-            self.prompt = ts.translate_text(query_text=self.prompt, translator='alibaba', from_language='auto', to_language='en')
+            self.prompt = translate(self.prompt)
         if len(self.negative_prompt) > 0:
-            self.negative_prompt = ts.translate_text(query_text=self.negative_prompt, translator='alibaba', from_language='auto', to_language='en')
+            self.negative_prompt = translate(self.negative_prompt)
 
 
 class TextToImageConfig(GenerateConfig):
