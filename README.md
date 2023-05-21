@@ -3,6 +3,7 @@
 <img width="1000" alt="image" src="https://github.com/ConnectAI-E/Feishu-Stablediffusion/assets/16874002/9c9233e5-6a3e-42e4-b562-760af22143ec">
 
 <!-- <details align='center'> -->
+
 <!--     <summary> 📷 点击展开完整功能截图</summary> -->
 <br>
 <p align='center'>
@@ -39,11 +40,12 @@
    https://wenjuan.feishu.cn/m/cfm?t=s6hfGkEr4pMi-8ph5
 </p>
 
----
+## 项目使用[Stable Diffusion WebUI](https://github.com/AUTOMATIC1111/stable-diffusion-webui)作为后端(带 `--api`参数启动)，飞书作为前端，通过机器人，不再需要打开网页，在飞书里就可以使用StableDiffusion进行各种创作！
 
-- [X] txt2img: 通过正反 prompt 生成图片，通过#号分开正反词
+- [X] txt2img: 通过正反词生成图片，支持**[中][英]**双语
 - [X] img2img: 支持以图生图
 - [X] img2txt: 支持 clip 模型识别图片内容
+- [X] 显示StableDiffusion服务器的相关信息
 - [X] 可以选择 model
 - [X] 可以设置生成图片的 size、step 与 seed 等参数
 - [X] 显示图片生成信息
@@ -61,7 +63,9 @@
 ## 操作方式
 
 - 以/开头的为操作命令
-- 只发文字消息为 txt2img，消息内容作为 prompt 和参数
+  - eg: `/model`
+- 只发文字消息为 txt2img，消息内容作为 prompt 和参数，通过#号分开正反词
+  - eg: `1girl # lowres,bad anatomy,bad hands`
 - 发图片带文字为 img2img，图片为基图，文字为 prompt 和参数
 - 只发图片为 img2txt，返回图片识别的内容
 
@@ -86,9 +90,10 @@
 | /model | str  | 设置 StableDiffuion 模型 |  |
 
 ## 设置关键词:
-- 使用关键词的格式--key [value] 
-  - eg:  --sampler [DPM++ 2S a Karras] --size [512x512]
-(*bool 类型的不用带参数，写了就是 True*)
+
+- 使用关键词的格式--key [value]
+  - eg: `--sampler [DPM++ 2S a Karras] --steps [30] --height [768]`
+    (_bool 类型的不用带参数，写了就是 True_)
 
 | 参数                 | 类型  | 功能                        | 默认值    |
 | -------------------- | ----- | --------------------------- | --------- |
