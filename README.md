@@ -42,7 +42,7 @@
 
 ## 项目使用[Stable Diffusion WebUI](https://github.com/AUTOMATIC1111/stable-diffusion-webui)作为后端(带 `--api`参数启动)，飞书作为前端，通过机器人，不再需要打开网页，在飞书里就可以使用StableDiffusion进行各种创作！
 
-- [X] txt2img: 通过正反词生成图片，支持**[中][英]**双语
+- [X] txt2img: 通过正反词生成图片，支持**中英**双语
 - [X] img2img: 支持以图生图
 - [X] img2txt: 支持 clip 模型识别图片内容
 - [X] 显示StableDiffusion服务器的相关信息
