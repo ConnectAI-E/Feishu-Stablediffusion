@@ -86,7 +86,7 @@ class StableDiffusionWebUI:
 
     def refresh_models(self):
         self.webui_api.refresh_checkpoints()
-        
+
     def host_info(self):
         memory_endpoint = 'memory'
         memory = self.webui_api.custom_get(memory_endpoint, True)
@@ -126,29 +126,40 @@ class StableDiffusionWebUI:
         return model
 
     def parse_prompts_args(self, prompt):
-        # 使用正则表达式匹配格式为 "--单词 [值]" 的文本
-        matches = re.findall(r'--\b\w+\b\s*\[[^\[\]]+\]', prompt)
+        # 使用正则表达式匹配格式为 "--key [value]" 的文本
+        pattern = r"--(\w+)\s*(\[.*?\]|\w*)"
+        matches = re.findall(pattern, prompt)
+
         result = {}
-        if len(matches) > 0 :
-            for match in matches:
-                option_match = re.findall(r'--\b\w+\b\s*\[[^\[\]]+\]', match)
-            for option in option_match:
-                if '--' in option:
-                    option_name = option.split('--', 1)[1].split(' ', 1)[0]
-                    option_value = option.split('[', 1)[1].split(']', 1)[0]
+        for match in matches:
+            option_name, option_value = match
 
-                    if option_name == 'batch_count':
-                        option_name = 'n_iters'
-                    elif option_name == 'sampler':
-                        option_name = 'sampler_name'
+            if not option_value:
+                option_value = True
+            elif option_value.startswith('[') and option_value.endswith(']'):
+                option_value = option_value[1:-1]
 
-                    result[option_name] = option_value
+            if option_name == 'batch_count':
+                option_name = 'n_iters'
+            elif option_name == 'sampler':
+                option_name = 'sampler_name'
+            elif option_name == 'model':
+                self.set_model(option_value)
 
-                    # 将匹配到的文本替换为空字符串
-                    prompt = re.sub(re.escape(option), '', prompt)
-    
+            result[option_name] = option_value
+
+            # 将匹配到的文本替换为空字符串
+            prompt = re.sub(pattern, '', prompt)
+
         # 将转换后的字典添加到原字典中
         text_dict = {'prompt': prompt}
+
+        # 处理反词
+        all_prompts = prompt.split('#', 1)
+        if len(all_prompts) > 1:
+            text_dict['prompt'] = all_prompts[0]
+            text_dict['negative_prompt'] = all_prompts[1]
+
         text_dict.update(result)
         return text_dict
 
