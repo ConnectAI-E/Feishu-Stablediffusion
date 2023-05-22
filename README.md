@@ -111,4 +111,3 @@
 | --hr_scale           | flat  | 设置放大倍率                | 2         |
 | --denoising_strength | float | 设置重绘强度                | 0.7       |
 | --resize_mode        | int   | 设置缩放模式                | 0         |
-| --image_cfg_scale    | float | 设置 Img2Img 时原图的控制度 | 1.5       |
