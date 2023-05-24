@@ -17,6 +17,8 @@ def init():
         return
 
     if not os.path.exists(DB_PATH):
+        db_dir = os.path.dirname(DB_PATH)
+        os.mkdir(db_dir)
         # create an empty database file
         open(DB_PATH, 'a').close()
         conn = sqlite3.connect(DB_PATH)
