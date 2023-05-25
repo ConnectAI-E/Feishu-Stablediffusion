@@ -67,7 +67,8 @@ def route_im_message(ctx: Context, conf: Config, event: MessageReceiveEvent) -> 
         if not done:
             message_sender.send_text_message(myevent, '生成失败！', True)
 
-        mark_event_processed(event)
-
     except Exception as e:
         message_sender.send_text_message(myevent, f'发生错误: {e}', True)
+
+    finally:
+        mark_event_processed(event)
