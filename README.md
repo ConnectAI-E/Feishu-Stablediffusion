@@ -111,3 +111,8 @@
 | --hr_scale           | flat  | 设置放大倍率                | 2         |
 | --denoising_strength | float | 设置重绘强度                | 0.7       |
 | --resize_mode        | int   | 设置缩放模式                | 0         |
+
+## 赞助感谢
+
+友情感谢 'Find My Ai' 提供的部分经费赞助！
+
