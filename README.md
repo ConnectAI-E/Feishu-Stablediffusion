@@ -1,7 +1,7 @@
 <p align='center'>
 <h3>古人云：道生一，一生二，二生StableDiffuion，StableDiffusion生万物</h2>
 <a href='https://qiniai.com' target="_blank" rel="noopener noreferrer">
-<img width="1000" alt="image" src="https://github.com/ConnectAI-E/Feishu-Stablediffusion/assets/16874002/9c9233e5-6a3e-42e4-b562-760af22143ec">
+<img width="1000" alt="image" src="https://github-production-user-asset-6210df.s3.amazonaws.com/16874002/238823929-9c9233e5-6a3e-42e4-b562-760af22143ec.png">
 </a>
 
 <!-- <details align='center'> -->
