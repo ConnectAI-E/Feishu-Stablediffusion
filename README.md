@@ -49,16 +49,92 @@
 
 ---
 
-## 部署
+## 部署 Stable Diffusion WebUI
 > 项目使用[Stable Diffusion WebUI](https://github.com/AUTOMATIC1111/stable-diffusion-webui)作为后端(带 `--api`参数启动)，飞书作为前端，通过机器人，不再需要打开网页，在飞书里就可以使用StableDiffusion进行各种创作！
+<details align='left'>
+<summary> 📷 点击查看详细步骤 </summary>
+<br>
+   
+### 更新 python 版本 
+
+使用 pyenv 安装 Python 3.10.6
+
+按以下命令依次执行
+
+```
+git clone https://github.com/pyenv/pyenv.git ~/.pyenv
+cd ~/.pyenv && src/configure && make -C src
+echo 'export PYENV_ROOT="$HOME/.pyenv"' >> ~/.bashrc
+echo 'command -v pyenv >/dev/null || export PATH="$PYENV_ROOT/bin:$PATH"' >> ~/.bashrc
+echo 'eval "$(pyenv init -)"' >> ~/.bashrc
+echo 'export PYENV_ROOT="$HOME/.pyenv"' >> ~/.profile
+echo 'command -v pyenv >/dev/null || export PATH="$PYENV_ROOT/bin:$PATH"' >> ~/.profile
+echo 'eval "$(pyenv init -)"' >> ~/.profile
+echo 'export PYENV_ROOT="$HOME/.pyenv"' >> ~/.bash_profile
+echo 'command -v pyenv >/dev/null || export PATH="$PYENV_ROOT/bin:$PATH"' >> ~/.bash_profile
+echo 'eval "$(pyenv init -)"' >> ~/.bash_profile
+sudo apt install wget lzma liblzma-dev build-essential libncursesw5-dev libssl-dev libsqlite3-dev tk-dev libgdbm-dev libc6-dev libbz2-dev libffi-dev zlib1g-dev 
+pyenv install 3.10.6
+pyenv global 3.10.6
+```
+
+### 切换国内 Linux 安装镜像
+
+```
+sudo cp /etc/apt/sources.list /etc/apt/sources.list.bak
+sudo vim/etc/apt/sources.list
+
+# 修改为下列源内容
+deb http://mirrors.aliyun.com/ubuntu/ focal main restricted universe multiverse 
+deb http://mirrors.aliyun.com/ubuntu/ focal-security main restricted universe multiverse 
+deb http://mirrors.aliyun.com/ubuntu/ focal-updates main restricted universe multiverse 
+deb http://mirrors.aliyun.com/ubuntu/ focal-proposed main restricted universe multiverse 
+deb http://mirrors.aliyun.com/ubuntu/ focal-backports main restricted universe multiverse 
+deb-src http://mirrors.aliyun.com/ubuntu/ focal main restricted universe multiverse 
+deb-src http://mirrors.aliyun.com/ubuntu/ focal-security main restricted universe multiverse 
+deb-src http://mirrors.aliyun.com/ubuntu/ focal-updates main restricted universe multiverse 
+deb-src http://mirrors.aliyun.com/ubuntu/ focal-proposed main restricted universe multiverse 
+deb-src http://mirrors.aliyun.com/ubuntu/ focal-backports main restricted universe multiverse
+# 源结束结束
 
 
-## 飞书机器人基础环境搭建
+sudo apt-get update
+sudo apt-get upgrade
+```
+
+### 安装 Nvidia 驱动
+
+```
+sudo apt update
+sudo apt upgrade
+sudo apt install nvidia-driver-530 nvidia-dkms-530
+sudo reboot
+```
+
+等待重启，重新登录服务器，测试安装驱动成功
+```
+nvidia-smi
+```
+
+
+### 安装stable-diffusion-webui 并启动服务
+
+```
+git clone https://github.com/AUTOMATIC1111/stable-diffusion-webui.git ~/stable-diffusion-webui
+cd ~/stable-diffusion-webui && bash webui.sh --api --listen
+## 等待安装完成，运行成功后，Ctrl+C停止进程，然后运行下面命令后台运行 stable-diffusion-webui
+cd ~/stable-diffusion-webui && nohup bash webui.sh --api --listen &
+```
+
+</details>
+
+## 部署飞书机器人
 
 1. 将*config-example.yml*复制为*config.yml*；
 2. 编辑*config.yml*，添加机器人以及 StableDiffusionWebUI 的服务器信息；
 3. （可选）创建 Python 虚拟环境 `python3 -m venv .venv && source .venv/bin/activate`；
 4. 安装依赖库 `pip install -r requirements.txt`，然后运行 `python3 src/main.py`；
+5. 其他飞书配置步骤，参考 [飞书-OpenAI](https://github.com/ConnectAI-E/Feishu-OpenAI) 部署指南 
 
 ## 操作方式
 
