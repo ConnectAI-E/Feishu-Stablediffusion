@@ -20,6 +20,10 @@ class AppConfig:
     WEBUI_USER: str
     WEBUI_PASSWORD: str
 
+    ALIYUN_ACCESS_KEY_ID: str
+    ALIYUN_ACCESS_KEY_SECRET: str
+    ALIYUN_MT_REGION_ID: str
+    
     @classmethod
     def from_dict(cls, env):
         return cls(**{

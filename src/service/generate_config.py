@@ -1,8 +1,7 @@
 from webuiapi import HiResUpscaler, ControlNetUnit
 from typing import List, Dict, Any
 from feishu.message_card import LIST_INFO_CARD, handle_list_info_card
-import translators as ts
-import html
+from service.aliyun_translator import aliyun_translator
 
 
 class GenerateConfig:
@@ -17,13 +16,13 @@ class GenerateConfig:
                 print(f'Unknown key {key} in json')
 
     def translate_to_english(self, translator='alibaba'):
-        def translate(text):
-            return html.unescape(ts.translate_text(query_text=text, translator=translator, from_language='auto', to_language='en'))
-        
+        # def translate(text):
+        #     return html.unescape(ts.translate_text(query_text=text, translator=translator, from_language='auto', to_language='en'))
+
         if len(self.prompt) > 0:
-            self.prompt = translate(self.prompt)
+            self.prompt = aliyun_translator.translate(self.prompt)
         if len(self.negative_prompt) > 0:
-            self.negative_prompt = translate(self.negative_prompt)
+            self.negative_prompt = aliyun_translator.translate(self.negative_prompt)
 
 
 class TextToImageConfig(GenerateConfig):

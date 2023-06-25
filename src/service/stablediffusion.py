@@ -38,13 +38,16 @@ class StableDiffusionWebUI:
         cmd_list = [
             {"label": "显示模型列表", "cmd": "/list_models"},
             {"label": "显示采样器列表", "cmd": "/list_samplers"},
+            {"label": "显示放大器列表", "cmd": "/list_upscalers"},
+            {"label": "显示控制网络模块列表", "cmd": "/list_controlnet_modules"},
+            {"label": "显示控制网络模型列表", "cmd": "/list_controlnet_models"},
             {"label": "显示主机信息", "cmd": "/host_info"},
             {"label": "显示当前队列", "cmd": "/queue"},
             {"label": "显示或设置模型", "cmd": "/model"},
         ]
 
         a = [
-            {"tag": "div", "text": {"content": "**我是SD-BOT，由stablediffusion赋能的图片机器人**", "tag": "lark_md"}},
+            {"tag": "div", "text": {"content": "**我是SD-BOT，由StableDiffusion赋能的AIGC机器人**", "tag": "lark_md"}},
             {"tag": "hr"},
             {"tag": "div", "text": {"content": "** 获取帮助**\n文本回复\"/help\"", "tag": "lark_md"}},
             {"tag": "hr"},
@@ -74,6 +77,22 @@ class StableDiffusionWebUI:
             samplers_list_txt = f'{samplers_list_txt}采样器：{sampler_name}\n'
 
         return samplers_list_txt
+
+    def list_controlnet_modules(self):
+        modules = self.webui_api.controlnet_module_list()
+        modules_list_txt = f'共有[{len(modules)}]个控制网络模块\n'
+        for module_name in modules:
+            modules_list_txt = f'{modules_list_txt}控制网络模块：{module_name}\n'
+            
+        return modules_list_txt
+    
+    def list_controlnet_models(self):
+        models = self.webui_api.controlnet_model_list()
+        models_list_txt = f'共有[{len(models)}]个控制网络模型\n'
+        for model_name in models:
+            models_list_txt = f'{models_list_txt}控制网络模型：{model_name}\n'
+            
+        return models_list_txt
 
     def list_upscalers(self):
         upscalers = self.webui_api.get_upscalers()

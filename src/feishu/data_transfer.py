@@ -21,7 +21,7 @@ img_service = ImageV4Service(feishu_conf)
 im_service = ImV1Service(feishu_conf)
 
 
-def upload_image(img_data):
+def upload_image(img_data: Image):
     buffered = io.BytesIO()
     img_data.save(buffered, format="PNG")
     formData = FormData()

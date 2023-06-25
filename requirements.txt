@@ -2,4 +2,4 @@ larksuite-oapi
 flask
 PyYAML
 webuiapi
-translators
+alibabacloud_alimt20181012
