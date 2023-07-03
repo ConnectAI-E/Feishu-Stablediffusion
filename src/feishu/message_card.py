@@ -83,12 +83,14 @@ def handle_image_card(image_info, img_key_list, prompt):
                       "mode": "fit_horizontal",
                       "preview": True
             })
-        elements.append(
-            {
-                  "tag": "markdown",
-                  "content": handle_infotexts(image_info),
-            }
-        )
+# 这部分展示图片信息，但是大部分信息用户并不关心，而且影响整体效果，图片信息比较有用的是模型名称，模型名称放在了排队原来队列展示行        
+#        elements.append(
+#            {
+#                  "tag": "markdown",
+#                  "content": handle_infotexts(image_info),
+#            }
+#        )
+
 
     elements.append({
         "tag": "action",
