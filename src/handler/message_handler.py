@@ -29,7 +29,7 @@ class MessageHandler:
         return handle_image_card(result['info'], images_key, prompts)
 
     def handle_message(self, myevent: MyReceiveEvent):
-        message_sender.send_text_message(myevent, f"正在生成图片，{sd_webui.queue()}")
+        message_sender.send_text_message(myevent, f"当前{sd_webui.queue()}")
         messageCard = self.handle_prompt(myevent.text)
 
         return message_sender.send_message_card(myevent, messageCard)
