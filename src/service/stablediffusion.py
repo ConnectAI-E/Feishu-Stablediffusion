@@ -123,11 +123,10 @@ class StableDiffusionWebUI:
 
     def queue(self):
         queue = self.webui_api.get_progress()
-#       queue_size = queue['state']['job_count']
-#       queue_progress = float(queue['progress']) * 100
-#       queue_eta = int(queue['eta_relative'])
-        modelx = self.webui_api.util_get_current_model()
-        queue_msg = f'模型[{modelx}]'
+        queue_size = queue['state']['job_count']
+        queue_progress = float(queue['progress']) * 100
+        queue_eta = int(queue['eta_relative'])
+        queue_msg = f'队列中有[{queue_size}]个任务，当前任务进度[{queue_progress}%]，预计还需要[{queue_eta}]秒'
 
         return queue_msg
 
