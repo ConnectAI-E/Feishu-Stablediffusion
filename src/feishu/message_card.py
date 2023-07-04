@@ -1,6 +1,4 @@
 import json
-import random
-
 
 LIST_INFO_CARD = {
     "config": {"wide_screen_mode": True},
@@ -57,10 +55,10 @@ def handle_infotexts(obj):
     obj['model'] = model_info
 
     def format_input_str(input_str, str_arr):
-        for key in str_arr:
-            input_str = input_str.replace(key + ':', '\n **【' + key + '】** ')
-        return input_str
-
+      for key in str_arr:
+          input_str = input_str.replace(key + ':', '\n **【' + key + '】** ')
+      return input_str
+  
     # 格式化字符串
     formatted_str = format_input_str('', obj.keys())
     for key, value in obj.items():
@@ -72,61 +70,47 @@ def handle_image_card(image_info, img_key_list, prompt):
     elements = [
         {"tag": "column_set", "flex_mode": "none", "background_style": "default", "columns": []},
     ]
-    #    prompts = [prompt.replace('<lora:Moxin_10:1>,', ''), '<lora:Moxin_10:1>,' + prompt]
 
     for index, img_key in enumerate(img_key_list):
-        prompts = [prompt.replace('<lora:Moxin_10:0.7>,', ''), '<lora:Moxin_10:0.7>,' + prompt.replace('<lora:Moxin_10:0.7>,', '')]
-
+        elements.append(
+          {
+                      "tag": "img",
+                      "img_key": img_key,
+                      "alt": {
+                        "tag": "plain_text",
+                        "content": ""
+                      },
+                      "mode": "fit_horizontal",
+                      "preview": True
+            })
         elements.append(
             {
-                "tag": "img",
-                "img_key": img_key,
-                "alt": {
-                    "tag": "plain_text",
-                    "content": ""
-                },
-                "mode": "fit_horizontal",
-                "preview": True
-            })
-        #        elements.append(
-        #            {
-        #                  "tag": "markdown",
-        #                  "content": handle_infotexts(image_info),
-        #            }
-        #        )
+                  "tag": "markdown",
+                  "content": handle_infotexts(image_info),
+            }
+        )
 
-
-        elements.append({
-            "tag": "action",
-
-            "actions": [
-                {
-                    "tag": "button",
-                    "text": {
-                        "tag": "plain_text",
-                        "content": "重新生成"
-                    },
-                    "type": "primary",
-                    "value": {
-                        "type": "reload",
-
-                        #             "prompt": prompt.split('<')[0] + '>' + prompt.split('>,')[2],
-
-                        "prompt": random.choice(prompts),
-
-                        #             "prompt":  '<lora:Moxin_10:1>,' + prompt,
-                        "action": "regenerate"  # 新增的属性，可以设置一个不同的操作类型
-                    }
-                }
-            ]
-        })
-
-
+    elements.append({
+        "tag": "action",
+        "actions": [
+          {
+            "tag": "button",
+            "text": {
+              "tag": "plain_text",
+              "content": "重新生成"
+            },
+            "type": "primary",
+            "value": {
+              "type": "reload",
+              "prompt": prompt,
+            }
+          }
+        ]
+    })
     return {"config": {"wide_screen_mode": True}, "elements": elements,  "header": {
-        #      "template": "green",
-        "title": {
-            "content":  "  美好的一天，从CottiCoffee开始！",
-            "tag": "plain_text"
-        }
+      "template": "green",
+      "title": {
+        "content": "🤖️ 根据如下参数生成:",
+        "tag": "plain_text"
+      }
     }}
-
