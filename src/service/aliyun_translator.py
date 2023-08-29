@@ -15,12 +15,13 @@ class AliyunTranslator:
         self.client = alimt20181012Client(config)
 
     def translate(self, source_text, format_type='text', source_language='zh', target_language='en', scene='general'):
+        # return original text if no aliyun access key
+        if app_config.ALIYUN_ACCESS_KEY_ID == None or app_config.ALIYUN_ACCESS_KEY_SECRET == None:
+            return source_text
+
         translate_general_request = alimt_20181012_models.TranslateGeneralRequest(
             source_text=source_text, format_type=format_type, source_language=source_language, target_language=target_language, scene=scene
         )
-        # return original text if no aliyun access key
-        if app_config.ALIYUN_ACCESS_KEY_ID == "" or app_config.ALIYUN_ACCESS_KEY_SECRET == "":
-            return source_text
 
         runtime = util_models.RuntimeOptions()
         try:
