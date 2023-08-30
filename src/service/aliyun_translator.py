@@ -19,18 +19,20 @@ class AliyunTranslator:
         if app_config.ALIYUN_ACCESS_KEY_ID == None or app_config.ALIYUN_ACCESS_KEY_SECRET == None:
             return source_text
 
-        translate_general_request = alimt_20181012_models.TranslateGeneralRequest(
-            source_text=source_text, format_type=format_type, source_language=source_language, target_language=target_language, scene=scene
-        )
-
-        runtime = util_models.RuntimeOptions()
         try:
-            result = self.client.translate_general_with_options(translate_general_request, runtime)
-        except Exception as error:
-            UtilClient.assert_as_string(error.message)
+            translate_general_request = alimt_20181012_models.TranslateGeneralRequest(
+                source_text=source_text, format_type=format_type, source_language=source_language, target_language=target_language, scene=scene
+            )
 
-        return result.body.data.translated
+            runtime = util_models.RuntimeOptions()
+            try:
+                result = self.client.translate_general_with_options(translate_general_request, runtime)
+            except Exception as error:
+                UtilClient.assert_as_string(error.message)
 
+            return result.body.data.translated
+        except:
+            return source_text
 
 aliyun_translator = AliyunTranslator()
 

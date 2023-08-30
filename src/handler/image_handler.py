@@ -8,6 +8,7 @@ from feishu.message_sender import message_sender
 from PIL import Image
 from io import BytesIO
 import translators as ts
+from service.aliyun_translator import aliyun_translator
 
 class ImageHandler:
     def __init__(self) -> None:
@@ -37,7 +38,10 @@ class ImageHandler:
         if myevent.text is None:
             message_sender.send_text_message(myevent, f"正在以图生文，{sd_webui.queue()}")
             clip_info_en = self.img2txt(img)
-            clip_info_cn = ts.translate_text(clip_info_en, translator='alibaba', from_language='en', to_language='zh-cn')
+            try:
+                clip_info_cn = ts.translate_text(clip_info_en, translator='alibaba', from_language='en', to_language='zh-cn')
+            except:
+                clip_info_cn = aliyun_translator.translate(clip_info_en)
             return message_sender.send_text_message(myevent, f'英文：{clip_info_en}\n中文：{clip_info_cn}')
         else:
             message_sender.send_text_message(myevent, f"正在以图生图，{sd_webui.queue()}")

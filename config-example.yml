@@ -19,7 +19,7 @@ WEBUI_USE_HTTPS: false
 WEBUI_USER:
 WEBUI_PASSWORD:
 
-# 阿里云翻译服务，每个月有一百万字符的免费额度，完全够用了，需要自行申请：https://mt.console.aliyun.com/
+# 【可选】备用的阿里云翻译服务，每个月有一百万字符的免费额度，完全够用了，需要自行申请：https://mt.console.aliyun.com/
 ALIYUN_ACCESS_KEY_ID: 
 ALIYUN_ACCESS_KEY_SECRET: 
 # 根据你开通的服务区域填写，比如（杭州）：cn-hangzhou

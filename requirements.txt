@@ -3,3 +3,4 @@ flask
 PyYAML
 webuiapi
 alibabacloud_alimt20181012
+translators

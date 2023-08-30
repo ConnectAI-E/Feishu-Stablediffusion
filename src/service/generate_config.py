@@ -2,7 +2,8 @@ from webuiapi import HiResUpscaler, ControlNetUnit
 from typing import List, Dict, Any
 from feishu.message_card import LIST_INFO_CARD, handle_list_info_card
 from service.aliyun_translator import aliyun_translator
-
+import translators as ts
+import html
 
 class GenerateConfig:
     def get_as_json(self) -> dict:
@@ -16,20 +17,25 @@ class GenerateConfig:
                 print(f'Unknown key {key} in json')
 
     def translate_to_english(self, translator='alibaba'):
-        # def translate(text):
-        #     return html.unescape(ts.translate_text(query_text=text, translator=translator, from_language='auto', to_language='en'))
+        def translate(text):
+            try:
+                result = html.unescape(ts.translate_text(query_text=text, translator=translator, from_language='auto', to_language='en'))
+            except:
+                result = html.unescape(aliyun_translator.translate(text))
+                
+            return result
 
         if len(self.prompt) > 0:
-            self.prompt = aliyun_translator.translate(self.prompt)
+            self.prompt = translate(self.prompt)
         if len(self.negative_prompt) > 0:
-            self.negative_prompt = aliyun_translator.translate(self.negative_prompt)
+            self.negative_prompt = translate(self.negative_prompt)
 
 
 class TextToImageConfig(GenerateConfig):
     def __init__(
         self,
         enable_hr=False,
-        denoising_strength=0.7,
+        denoising_strength=0.6,
         firstphase_width=0,
         firstphase_height=0,
         hr_scale=2,
@@ -44,18 +50,18 @@ class TextToImageConfig(GenerateConfig):
         subseed_strength=0.0,
         seed_resize_from_h=0,
         seed_resize_from_w=0,
-        sampler_name=None,  # use this instead of sampler_index
+        sampler_name='DPM++ 2M SDE Karras',  # use this instead of sampler_index
         batch_size=1,
         n_iter=1,
-        steps=None,
+        steps=30,
         cfg_scale=7.0,
         width=512,
-        height=512,
-        restore_faces=True,
+        height=768,
+        restore_faces=False,
         tiling=False,
         do_not_save_samples=False,
         do_not_save_grid=False,
-        negative_prompt="NG_DeepNegative_V1_75T, worst quality, low quality, nsfw, nipples, nude, lowres, bad anatomy, bad hands",
+        negative_prompt="embedding:FastNegativeV2, embedding:BadDream, embedding:UnrealisticDream",
         eta=1.0,
         s_churn=0,
         s_tmax=0,
@@ -122,7 +128,7 @@ class ImageToImageConfig(GenerateConfig):
         self,
         images=[],  # list of PIL Image
         resize_mode=0,
-        denoising_strength=0.75,
+        denoising_strength=0.7,
         image_cfg_scale=1.5,
         mask_image=None,  # PIL Image mask
         mask_blur=4,
@@ -138,18 +144,18 @@ class ImageToImageConfig(GenerateConfig):
         subseed_strength=0,
         seed_resize_from_h=0,
         seed_resize_from_w=0,
-        sampler_name=None,  # use this instead of sampler_index
+        sampler_name='DPM++ 2M SDE Karras',  # use this instead of sampler_index
         batch_size=1,
         n_iter=1,
-        steps=None,
+        steps=30,
         cfg_scale=7.0,
         width=512,
-        height=512,
-        restore_faces=True,
+        height=768,
+        restore_faces=False,
         tiling=False,
         do_not_save_samples=False,
         do_not_save_grid=False,
-        negative_prompt="NG_DeepNegative_V1_75T, worst quality, low quality, nsfw, nipples, nude, lowres, bad anatomy, bad hands",
+        negative_prompt="embedding:FastNegativeV2, embedding:BadDream, embedding:UnrealisticDream",
         eta=1.0,
         s_churn=0,
         s_tmax=0,
